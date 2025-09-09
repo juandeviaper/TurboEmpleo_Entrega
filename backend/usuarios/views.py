@@ -1,0 +1,49 @@
+from rest_framework import viewsets
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .serializers import UsuarioSerializer, AspiranteSerializer, EmpresaSerializer, VacanteSerializer, UsuarioRegistroSerializer
+from .models import Usuarios, Aspirante, Empresa, Vacante
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import MyTokenObtainPairSerializer
+class UsuarioViewSet(viewsets.ModelViewSet):
+    queryset = Usuarios.objects.all()
+    serializer_class = UsuarioSerializer
+
+from rest_framework import filters
+
+class AspiranteViewSet(viewsets.ModelViewSet):
+    queryset = Aspirante.objects.all()
+    serializer_class = AspiranteSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['asp_usuario_fk__user_nombre']
+
+class EmpresaViewSet(viewsets.ModelViewSet):
+    queryset = Empresa.objects.all()
+    serializer_class = EmpresaSerializer
+
+
+class VacanteViewSet(viewsets.ModelViewSet):
+    queryset = Vacante.objects.all()
+    serializer_class = VacanteSerializer
+
+class DetalleVacanteViewSet(viewsets.ModelViewSet):
+    pass  # Eliminado Detalle_Vacante
+
+
+
+
+class UsuarioRegistroView(APIView):
+    def post(self, request):
+        serializer = UsuarioRegistroSerializer(data=request.data)
+        if serializer.is_valid():
+            usuario = serializer.save()
+            return Response(
+                {"message": "Usuario registrado exitosamente"},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
