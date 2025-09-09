@@ -13,7 +13,9 @@ import Register from './pages/public/Register';
 // Vistas privadas (admin)
 import Admin from './pages/admin/Admin';
 import Aspirantes from './pages/aspirantes/Aspirantes';
+import DashboardAspirante from './pages/aspirantes/DashboardAspirante';
 import Empresas from './pages/empresas/Empresas';
+import DashboardRedirect from './pages/DashboardRedirect';
 
 function App() {
   return (
@@ -28,6 +30,10 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/aspirantes" element={<Aspirantes />} />
         <Route path="/admin/empresas" element={<Empresas />} />
+  {/* Dashboard privado del aspirante */}
+  <Route path="/aspirante/dashboard" element={<DashboardAspirante />} />
+  {/* Redirección inteligente para /dashboard */}
+  <Route path="/dashboard" element={<DashboardRedirect />} />
       </Routes>
     </BrowserRouter>
   );

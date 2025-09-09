@@ -20,8 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `turboempleo`
 --
-CREATE DATABASE IF NOT EXISTS `turboempleo` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `turboempleo`;
+CREATE DATABASE IF NOT EXISTS `turboempleo_2` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `turboempleo_2`;
 
 -- --------------------------------------------------------
 
