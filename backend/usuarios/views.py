@@ -1,8 +1,20 @@
+from .models import ExperienciaLaboral, ExperienciaEscolar
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UsuarioSerializer, AspiranteSerializer, EmpresaSerializer, VacanteSerializer, UsuarioRegistroSerializer
+from .serializers import UsuarioSerializer, AspiranteSerializer, EmpresaSerializer, VacanteSerializer, UsuarioRegistroSerializer, ExperienciaLaboralSerializer, ExperienciaEscolarSerializer
+# ViewSet para ExperienciaLaboral
+from rest_framework import viewsets
+
+class ExperienciaLaboralViewSet(viewsets.ModelViewSet):
+    queryset = ExperienciaLaboral.objects.all()
+    serializer_class = ExperienciaLaboralSerializer
+
+# ViewSet para ExperienciaEscolar
+class ExperienciaEscolarViewSet(viewsets.ModelViewSet):
+    queryset = ExperienciaEscolar.objects.all()
+    serializer_class = ExperienciaEscolarSerializer
 from .models import Usuarios, Aspirante, Empresa, Vacante
 
 from rest_framework_simplejwt.views import TokenObtainPairView

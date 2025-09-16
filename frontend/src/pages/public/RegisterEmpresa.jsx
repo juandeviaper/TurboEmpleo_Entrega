@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 // ...existing code...
 
 import React, { useRef, useState } from "react";
@@ -22,6 +23,9 @@ function RegisterEmpresa() {
     logo: null,
     idiomas: [],
   });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [aceptaDatos, setAceptaDatos] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -30,6 +34,10 @@ function RegisterEmpresa() {
     } else if (name === "idiomas") {
       const selected = Array.from(e.target.selectedOptions, option => option.value);
       setForm((f) => ({ ...f, idiomas: selected }));
+    } else if (name === "telefono" || name === "nit") {
+      // Solo permitir números
+      const numericValue = value.replace(/[^0-9]/g, "");
+      setForm((f) => ({ ...f, [name]: numericValue }));
     } else {
       setForm((f) => ({ ...f, [name]: value }));
     }
@@ -37,8 +45,47 @@ function RegisterEmpresa() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
+    if (!aceptaDatos) {
+      setError("Debes aceptar el tratamiento de datos personales para continuar.");
+      return;
+    }
+    // Validaciones básicas en frontend
+    if (!form.email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
+      setError("El correo electrónico no es válido.");
+      return;
+    }
+    if (form.password.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
+    if (!form.nit) {
+      setError("El NIT es obligatorio.");
+      return;
+    }
+    if (!/^[0-9]+$/.test(form.nit)) {
+      setError("El NIT solo puede contener números.");
+      return;
+    }
+    if (form.telefono.length < 7) {
+      setError("El teléfono debe tener al menos 7 dígitos y solo números.");
+      return;
+    }
+    if (!/^[0-9]+$/.test(form.telefono)) {
+      setError("El teléfono solo puede contener números.");
+      return;
+    }
+    if (!form.sitioWeb) {
+      setError("El sitio web es obligatorio.");
+      return;
+    }
+    if (!/^https?:\/\/.+\..+/.test(form.sitioWeb)) {
+      setError("La URL del sitio web no es válida. Debe comenzar con http:// o https://");
+      return;
+    }
     const formData = new FormData();
-  formData.append('user_nombre', form.nombreEmpresa); // Usar nombre de empresa como usuario
+    formData.append('user_nombre', form.nombreEmpresa); // Usar nombre de empresa como usuario
     formData.append('user_contraseña', form.password);
     formData.append('user_rol', 'Empresa');
     formData.append('em_nombre', form.nombreEmpresa);
@@ -66,18 +113,45 @@ function RegisterEmpresa() {
       });
       const data = await response.json();
       if (response.ok) {
-        alert('¡Registro de empresa enviado exitosamente!');
+        // Guardar token y user_data si vienen en la respuesta
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+        if (data.user) {
+          localStorage.setItem('user_data', JSON.stringify(data.user));
+        }
+        setSuccess('¡Registro de empresa enviado exitosamente!');
+        setForm({
+          nombreEmpresa: "",
+          nit: "",
+          email: "",
+          telefono: "",
+          departamento: "",
+          ciudad: "",
+          sector: "",
+          contacto: "",
+          password: "",
+          descripcion: "",
+          sitioWeb: "",
+          tamano: "",
+          direccion: "",
+          curriculum: null,
+          logo: null,
+          idiomas: [],
+        });
       } else {
-        alert(data.message || 'Error al registrar empresa');
+        setError(data.message || data.detail || 'Error al registrar empresa');
       }
     } catch (err) {
-      alert('Error de conexión');
+      setError('Error de conexión');
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] mb-12 w-full">
       <h2 className="text-2xl font-bold text-[#A67AFF] mb-4 text-center">Crea tu empresa</h2>
+      {error && <div className="w-full max-w-3xl bg-red-100 text-red-700 px-4 py-2 rounded mb-2 text-center border border-red-300">{error}</div>}
+      {success && <div className="w-full max-w-3xl bg-green-100 text-green-700 px-4 py-2 rounded mb-2 text-center border border-green-300">{success}</div>}
       <form className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-8 border-t-4 border-[#A67AFF]" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Columna izquierda */}
@@ -88,7 +162,7 @@ function RegisterEmpresa() {
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">NIT</label>
-              <input name="nit" value={form.nit} onChange={handleChange} type="text" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A67AFF]" required />
+              <input name="nit" value={form.nit} onChange={handleChange} type="text" pattern="[0-9]*" inputMode="numeric" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A67AFF]" required />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Correo de contacto</label>
@@ -96,7 +170,7 @@ function RegisterEmpresa() {
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Teléfono</label>
-              <input name="telefono" value={form.telefono} onChange={handleChange} type="tel" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A67AFF]" required />
+              <input name="telefono" value={form.telefono} onChange={handleChange} type="tel" pattern="[0-9]*" inputMode="numeric" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A67AFF]" required />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Departamento</label>
@@ -154,7 +228,7 @@ function RegisterEmpresa() {
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Sitio web</label>
-              <input name="sitioWeb" value={form.sitioWeb} onChange={handleChange} type="url" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A67AFF]" placeholder="https://" />
+              <input name="sitioWeb" value={form.sitioWeb} onChange={handleChange} type="url" required className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A67AFF]" placeholder="https://" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Tamaño de empresa</label>
@@ -201,6 +275,20 @@ function RegisterEmpresa() {
         <div className="mt-4">
           <label className="block text-sm font-semibold text-gray-700 mb-1">Descripción de la empresa</label>
           <textarea name="descripcion" value={form.descripcion} onChange={handleChange} placeholder="Describe brevemente a tu empresa, misión, visión, etc." className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A67AFF]" rows={4} required />
+        </div>
+        {/* Checkbox de tratamiento de datos */}
+        <div className="flex items-center mt-2">
+          <input
+            type="checkbox"
+            id="aceptaDatos"
+            checked={aceptaDatos}
+            onChange={e => setAceptaDatos(e.target.checked)}
+            className="accent-[#A67AFF] mr-2"
+            required
+          />
+          <label htmlFor="aceptaDatos" className="text-sm text-gray-700 select-none">
+            Acepto el <Link to="/PoliticaDatos" target="_blank" rel="noopener noreferrer" className="underline text-[#A67AFF]">tratamiento de datos personales</Link>
+          </label>
         </div>
         <button type="submit" className="w-full bg-[#A67AFF] text-white font-bold py-3 rounded-lg shadow hover:bg-[#5e17eb] transition text-lg mt-6">Registrar empresa</button>
       </form>

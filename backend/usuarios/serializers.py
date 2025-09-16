@@ -1,4 +1,17 @@
 from rest_framework import serializers
+from .models import ExperienciaLaboral, ExperienciaEscolar
+# Serializer para ExperienciaLaboral
+class ExperienciaLaboralSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExperienciaLaboral
+        fields = '__all__'
+
+# Serializer para ExperienciaEscolar
+class ExperienciaEscolarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExperienciaEscolar
+        fields = '__all__'
+from rest_framework import serializers
 from .models import Rol, Usuarios, Aspirante, Empresa, Vacante
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 

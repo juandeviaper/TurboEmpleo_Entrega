@@ -7,7 +7,8 @@ from rest_framework_simplejwt.views import (
 )
 from usuarios.views import (
     UsuarioViewSet, AspiranteViewSet, EmpresaViewSet,
-    VacanteViewSet, UsuarioRegistroView, MyTokenObtainPairView
+    VacanteViewSet, UsuarioRegistroView, MyTokenObtainPairView,
+    ExperienciaLaboralViewSet, ExperienciaEscolarViewSet
 )
 
 # Crea un enrutador (router)
@@ -17,7 +18,10 @@ router.register(r'aspirantes', AspiranteViewSet)
 router.register(r'empresas', EmpresaViewSet)
 
 # Agrega estas líneas
+
 router.register(r'vacantes', VacanteViewSet)
+router.register(r'experiencia_laboral', ExperienciaLaboralViewSet)
+router.register(r'experiencia_escolar', ExperienciaEscolarViewSet)
 
 
 
@@ -26,9 +30,9 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/registro/', UsuarioRegistroView.as_view(), name='registro'),
+    path('api/usuarios/', include('usuarios.urls')),
     path('api/', include(router.urls)),
     path('api/login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/usuarios/', include('usuarios.urls')),
 ]
 
 # Servir archivos media en desarrollo

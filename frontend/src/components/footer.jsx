@@ -1,5 +1,7 @@
 
 
+import { Link } from "react-router-dom";
+
 function Footer() {
   return (
     <footer className="w-full bg-[#5e17eb] py-8 flex flex-col items-center gap-4 text-center mt-auto">
@@ -10,8 +12,9 @@ function Footer() {
           </svg>
           Instagram oficial
         </a>
-        <a href="#" className="text-white hover:underline">Política de privacidad</a>
-        <a href="#" className="text-white hover:underline">Términos de uso</a>
+  <Link to="/PoliticaPrivacidad" className="text-white hover:underline">Política de privacidad</Link>
+  <Link to="/TerminosUso" className="text-white hover:underline">Términos de uso</Link>
+  <Link to="/PoliticaDatos" className="text-white hover:underline">Tratamiento de datos personales</Link>
       </div>
       <span className="text-white text-sm mt-2">⚡ Proyecto académico desarrollado en el SENA – 2025.</span>
     </footer>

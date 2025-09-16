@@ -20,17 +20,24 @@ function Login() {
 			});
 			const data = await response.json();
 			if (response.ok) {
-				localStorage.setItem("token", data.access);
+				// Guardar token (aceptar tanto access como token por compatibilidad)
+				if (data.token) {
+				  localStorage.setItem("token", data.token);
+				} else if (data.access) {
+				  localStorage.setItem("token", data.access);
+				}
 				// Obtener datos del aspirante tras login exitoso
 				try {
 					const aspRes = await fetch(`http://127.0.0.1:8000/api/aspirantes/?search=${userNombre}`, {
-						headers: { Authorization: `Bearer ${data.access}` },
+						headers: { Authorization: `Bearer ${data.token || data.access}` },
 					});
 					const aspData = await aspRes.json();
 					if (aspRes.ok && Array.isArray(aspData) && aspData.length > 0) {
 						localStorage.setItem("user_data", JSON.stringify(aspData[0]));
+						console.log('user_data guardado tras login:', aspData[0]);
 					}
 				} catch (e) { /* No bloquear login si falla */ }
+				// Forzar recarga para que Navbar detecte sesión
 				window.location.href = "/dashboard";
 			} else {
 				setError(data.detail || "Credenciales incorrectas");

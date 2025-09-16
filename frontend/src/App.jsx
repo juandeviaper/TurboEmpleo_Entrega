@@ -1,3 +1,7 @@
+import CompletarPerfilAspirante from './pages/aspirantes/CompletarPerfilAspirante';
+import PoliticaPrivacidad from './pages/public/PoliticaPrivacidad';
+import TerminosUso from './pages/public/TerminosUso';
+import PoliticaDatos from './pages/public/PoliticaDatos';
 // src/App.jsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
@@ -14,6 +18,7 @@ import Register from './pages/public/Register';
 import Admin from './pages/admin/Admin';
 import Aspirantes from './pages/aspirantes/Aspirantes';
 import DashboardAspirante from './pages/aspirantes/DashboardAspirante';
+import PerfilAspirante from './pages/aspirantes/PerfilAspirante';
 import Empresas from './pages/empresas/Empresas';
 import DashboardRedirect from './pages/DashboardRedirect';
 
@@ -26,14 +31,21 @@ function App() {
   <Route path="/login" element={<><Navbar /><Login /></>} />
         <Route path="/register" element={<Layout><Register /></Layout>} />
 
+  {/* Rutas legales */}
+  <Route path="/PoliticaPrivacidad" element={<Layout><PoliticaPrivacidad /></Layout>} />
+  <Route path="/TerminosUso" element={<Layout><TerminosUso /></Layout>} />
+  <Route path="/PoliticaDatos" element={<Layout><PoliticaDatos /></Layout>} />
+
         {/* Rutas privadas (admin) */}
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/aspirantes" element={<Aspirantes />} />
         <Route path="/admin/empresas" element={<Empresas />} />
   {/* Dashboard privado del aspirante */}
   <Route path="/aspirante/dashboard" element={<DashboardAspirante />} />
+  <Route path="/aspirantes/perfil" element={<PerfilAspirante />} />
   {/* Redirección inteligente para /dashboard */}
   <Route path="/dashboard" element={<DashboardRedirect />} />
+        <Route path="/aspirantes/completar-perfil" element={<CompletarPerfilAspirante />} />
       </Routes>
     </BrowserRouter>
   );
