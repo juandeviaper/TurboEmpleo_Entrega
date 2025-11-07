@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import Empresa, Vacante, Postulacion, ExperienciaLaboral, ExperienciaEscolar, Rol, Usuarios, Aspirante
+from .models import Empresa, Vacante, Postulacion, ExperienciaLaboral, ExperienciaEscolar, Rol, Usuarios, Aspirante, Notificacion
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 # Serializador anidado para Empresa
@@ -316,3 +316,10 @@ class UsuarioRegistroSerializer(serializers.Serializer):
                 fail_silently=False,
             )
         return usuario
+
+# Serializer para Notificacion
+class NotificacionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notificacion
+        fields = '__all__'
+        read_only_fields = ('not_fecha',)

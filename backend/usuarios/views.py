@@ -1,7 +1,9 @@
-from .models import Postulacion
-from .serializers import PostulacionSerializer
+from .models import Postulacion, Notificacion
+from .serializers import PostulacionSerializer, NotificacionSerializer
 # ViewSet para Postulacion
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 class PostulacionViewSet(viewsets.ModelViewSet):
     queryset = Postulacion.objects.all()
 
@@ -135,3 +137,117 @@ class UsuarioRegistroView(APIView):
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+# ViewSet para Notificaciones
+class NotificacionViewSet(viewsets.ModelViewSet):
+    queryset = Notificacion.objects.all()
+    serializer_class = NotificacionSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        """Filtrar notificaciones del usuario actual"""
+        user = self.request.user
+        queryset = Notificacion.objects.filter(not_usuario_fk=user).order_by('-not_fecha')
+        
+        # Filtrar por estado (leída/no leída)
+        estado = self.request.query_params.get('not_estado', None)
+        if estado is not None:
+            queryset = queryset.filter(not_estado=estado)
+        
+        return queryset
+    
+    @action(detail=True, methods=['post'])
+    def marcar_leida(self, request, pk=None):
+        """Marcar una notificación como leída"""
+        notificacion = self.get_object()
+        notificacion.not_estado = 'Leída'
+        notificacion.save()
+        serializer = self.get_serializer(notificacion)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['post'])
+    def marcar_todas_leidas(self, request):
+        """Marcar todas las notificaciones del usuario como leídas"""
+        user = request.user
+        Notificacion.objects.filter(not_usuario_fk=user, not_estado='No leída').update(not_estado='Leída')
+        return Response({'message': 'Todas las notificaciones han sido marcadas como leídas'})
+    
+    @action(detail=False, methods=['get'])
+    def no_leidas_count(self, request):
+        """Obtener el conteo de notificaciones no leídas"""
+        user = request.user
+        count = Notificacion.objects.filter(not_usuario_fk=user, not_estado='No leída').count()
+        return Response({'count': count})
+
+
+# Vista para el formulario de contacto
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from django.core.mail import send_mail
+from django.conf import settings
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def contacto_view(request):
+    """
+    Vista para procesar el formulario de contacto.
+    Envía un email con los datos del formulario.
+    """
+    try:
+        nombre = request.data.get('nombre', '')
+        email = request.data.get('email', '')
+        asunto = request.data.get('asunto', '')
+        mensaje = request.data.get('mensaje', '')
+        
+        # Validar que todos los campos estén presentes
+        if not all([nombre, email, asunto, mensaje]):
+            return Response(
+                {'error': 'Todos los campos son requeridos'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Construir el mensaje del email
+        mensaje_email = f"""
+Nuevo mensaje de contacto de TurboEmpleo:
+
+Nombre: {nombre}
+Email: {email}
+Asunto: {asunto}
+
+Mensaje:
+{mensaje}
+"""
+        
+        # En desarrollo, imprimir en consola
+        print('='*60)
+        print('NUEVO MENSAJE DE CONTACTO')
+        print('='*60)
+        print(mensaje_email)
+        print('='*60)
+        
+        # Intentar enviar email (opcional en desarrollo)
+        try:
+            # Configurar el email solo si está configurado en settings
+            if hasattr(settings, 'EMAIL_HOST') and settings.EMAIL_HOST:
+                send_mail(
+                    subject=f'Contacto TurboEmpleo: {asunto}',
+                    message=mensaje_email,
+                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@turboempleo.co'),
+                    recipient_list=[getattr(settings, 'CONTACT_EMAIL', 'contacto@turboempleo.co')],
+                    fail_silently=True,
+                )
+        except Exception as email_error:
+            # Si falla el email, solo lo registramos pero no fallar la petición
+            print(f"Advertencia: No se pudo enviar email: {str(email_error)}")
+        
+        return Response(
+            {'message': 'Mensaje enviado con éxito'},
+            status=status.HTTP_200_OK
+        )
+            
+    except Exception as e:
+        print(f"Error en contacto_view: {str(e)}")
+        return Response(
+            {'error': 'Error al procesar el mensaje'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

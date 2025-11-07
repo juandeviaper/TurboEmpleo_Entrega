@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
+import Breadcrumbs from '../../components/Breadcrumbs';
 import { FaSync, FaList, FaChartBar, FaMapMarkerAlt, FaCalendarAlt, FaUser, FaFileAlt, FaTimes, FaEnvelope, FaPhone, FaBriefcase, FaGraduationCap, FaLanguage, FaIdCard } from 'react-icons/fa';
 
 function PostulacionesRecibidasEmpresa() {
@@ -20,6 +21,11 @@ function PostulacionesRecibidasEmpresa() {
     const [modalAbierto, setModalAbierto] = useState(false);
     const token = localStorage.getItem("token");
     const navigate = useNavigate();
+
+    const breadcrumbItems = [
+        { label: 'Dashboard', path: '/empresas/dashboard' },
+        { label: 'Postulaciones Recibidas', active: true }
+    ];
     
     let empresaId = null;
     try {
@@ -183,6 +189,9 @@ function PostulacionesRecibidasEmpresa() {
     return (
         <>
             <Navbar />
+            <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50 pt-24 pb-10">
+                <div className="container mx-auto px-4 max-w-7xl">
+                    <Breadcrumbs items={breadcrumbItems} />
             
             {/* Modal de Perfil del Aspirante */}
             {modalAbierto && aspiranteSeleccionado && (
@@ -344,8 +353,7 @@ function PostulacionesRecibidasEmpresa() {
                     </div>
                 </div>
             )}
-            
-            <div className="min-h-screen flex flex-col bg-[#f6f4fa] items-center py-10 pt-24">
+                
                 <h1 className="text-3xl font-bold text-[#A67AFF] mb-6">Panel de Postulaciones</h1>
                 
                 {/* Panel de Filtros */}
@@ -684,6 +692,7 @@ function PostulacionesRecibidasEmpresa() {
                         })}
                     </div>
                 )}
+            </div>
             </div>
             <Footer />
         </>

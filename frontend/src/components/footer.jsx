@@ -34,10 +34,10 @@ function Footer() {
             <h3 className="text-lg font-semibold mb-6">Enlaces rápidos</h3>
             <ul className="space-y-3">
               <li><Link to="/" className="text-gray-400 hover:text-[#ffde59]">Inicio</Link></li>
-              <li><Link to="/vacantes" className="text-gray-400 hover:text-[#ffde59]">Buscar empleo</Link></li>
-              <li><Link to="/empresas" className="text-gray-400 hover:text-[#ffde59]">Empresas</Link></li>
-              <li><Link to="/blog" className="text-gray-400 hover:text-[#ffde59]">Blog</Link></li>
-              <li><Link to="/nosotros" className="text-gray-400 hover:text-[#ffde59]">Sobre nosotros</Link></li>
+              <li><Link to="/login" className="text-gray-400 hover:text-[#ffde59]">Buscar empleo</Link></li>
+              <li><Link to="/register" className="text-gray-400 hover:text-[#ffde59]">Empresas</Link></li>
+              <li><span className="text-gray-500 cursor-not-allowed">Blog (Próximamente)</span></li>
+              <li><span className="text-gray-500 cursor-not-allowed">Sobre nosotros (Próximamente)</span></li>
               <li><Link to="/contacto" className="text-gray-400 hover:text-[#ffde59]">Contacto</Link></li>
             </ul>
           </div>
@@ -45,10 +45,10 @@ function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-6">Para empresas</h3>
             <ul className="space-y-3">
-              <li><Link to="/empresas/publicar" className="text-gray-400 hover:text-[#ffde59]">Publicar vacante</Link></li>
-              <li><Link to="/empresas/planes" className="text-gray-400 hover:text-[#ffde59]">Planes y precios</Link></li>
-              <li><Link to="/empresas/recursos" className="text-gray-400 hover:text-[#ffde59]">Recursos para reclutadores</Link></li>
-              <li><Link to="/empresas/testimonios" className="text-gray-400 hover:text-[#ffde59]">Testimonios</Link></li>
+              <li><Link to="/register" className="text-gray-400 hover:text-[#ffde59]">Publicar vacante</Link></li>
+              <li><span className="text-gray-500 cursor-not-allowed">Planes y precios (Próximamente)</span></li>
+              <li><span className="text-gray-500 cursor-not-allowed">Recursos (Próximamente)</span></li>
+              <li><span className="text-gray-500 cursor-not-allowed">Testimonios (Próximamente)</span></li>
             </ul>
           </div>
 

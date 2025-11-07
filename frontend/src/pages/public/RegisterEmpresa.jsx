@@ -565,7 +565,7 @@ function RegisterEmpresa() {
               required
             />
             <label htmlFor="aceptaDatos" className="text-sm text-gray-700">
-              Acepto el <Link to="/PoliticaDatos" target="_blank" rel="noopener noreferrer" className="underline text-[#5e17eb] font-medium">tratamiento de datos personales</Link> y los términos y condiciones de TurboEmpleo
+              Acepto el <Link to="/PoliticaDatos" target="_blank" rel="noopener noreferrer" className="underline text-[#5e17eb] font-medium">tratamiento de datos personales</Link> y los <Link to="/TerminosUso" target="_blank" rel="noopener noreferrer" className="underline text-[#5e17eb] font-medium">términos y condiciones</Link> de TurboEmpleo
             </label>
           </div>
           

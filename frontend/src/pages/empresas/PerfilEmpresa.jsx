@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
+import Breadcrumbs from "../../components/Breadcrumbs";
 
 
 function PerfilEmpresa() {
@@ -17,6 +18,11 @@ function PerfilEmpresa() {
     const token = localStorage.getItem("token");
     const userData = JSON.parse(localStorage.getItem("user_data") || "null");
     const empresaId = userData ? userData.id : null;
+
+    const breadcrumbItems = [
+        { label: 'Dashboard', path: '/empresas/dashboard' },
+        { label: 'Mi Perfil', active: true }
+    ];
 
     // Previsualizar logo
     useEffect(() => {
@@ -97,7 +103,11 @@ function PerfilEmpresa() {
     return (
         <div className="min-h-screen flex flex-col bg-[#f6f4fa]">
             <Navbar />
-            <main className="flex-1 flex flex-row justify-center pt-24 pb-10 px-4">
+            <main className="flex-1 flex flex-col items-center pt-24 pb-10 px-4">
+                <div className="w-full max-w-7xl mb-6">
+                    <Breadcrumbs items={breadcrumbItems} />
+                </div>
+                <div className="flex flex-row justify-center w-full max-w-7xl">
                 {/* Sidebar */}
                 <aside className="w-64 bg-white rounded-2xl shadow-xl p-6 mr-8 h-fit sticky top-24 border-t-4 border-[#A67AFF] flex flex-col gap-4">
                     <button
@@ -319,6 +329,7 @@ function PerfilEmpresa() {
                         </div>
                     )}
                 </section>
+                </div>
             </main>
             <Footer />
         </div>

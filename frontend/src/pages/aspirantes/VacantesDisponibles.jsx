@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
+import Breadcrumbs from '../../components/Breadcrumbs';
 import { FaBuilding } from 'react-icons/fa';
 
 function VacantesDisponibles() {
@@ -16,6 +17,11 @@ function VacantesDisponibles() {
     const [filtroUbicacion, setFiltroUbicacion] = useState("");
     const [filtroTipoEmpleo, setFiltroTipoEmpleo] = useState("");
     const [filtroBusqueda, setFiltroBusqueda] = useState("");
+
+    const breadcrumbItems = [
+        { label: 'Dashboard', path: '/aspirantes/dashboard' },
+        { label: 'Vacantes Disponibles', active: true }
+    ];
 
     const fetchVacantes = () => {
         setLoading(true);
@@ -105,7 +111,9 @@ function VacantesDisponibles() {
         <>
             <Navbar />
             <div className="min-h-screen flex flex-col bg-[#f6f4fa] items-center py-10 pt-24">
-                <h1 className="text-3xl font-bold text-[#A67AFF] mb-6">Vacantes disponibles</h1>
+                <div className="w-full max-w-6xl px-4">
+                    <Breadcrumbs items={breadcrumbItems} />
+                    <h1 className="text-3xl font-bold text-[#A67AFF] mb-6">Vacantes disponibles</h1>
                 
                 {/* Panel de Filtros */}
                 <div className="w-full max-w-6xl bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-[#5e17eb]">
@@ -221,6 +229,7 @@ function VacantesDisponibles() {
                         })}
                     </div>
                 )}
+                </div>
             </div>
             <Footer />
         </>

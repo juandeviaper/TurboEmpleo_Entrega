@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
+import Breadcrumbs from '../../components/Breadcrumbs';
 import FormVacanteEmpresa from "./FormVacanteEmpresa";
 import { FaDollarSign, FaMapMarkerAlt, FaClock, FaEye, FaEdit, FaTrash, FaTimes, FaCheckCircle, FaTimesCircle, FaBriefcase, FaFileAlt, FaClipboardList, FaBullseye, FaGift } from 'react-icons/fa';
 
@@ -15,6 +16,11 @@ function VacantesEmpresa() {
     const token = localStorage.getItem("token");
     const userData = JSON.parse(localStorage.getItem("user_data") || "null");
     const empresaId = userData ? userData.id : null;
+
+    const breadcrumbItems = [
+        { label: 'Dashboard', path: '/empresas/dashboard' },
+        { label: 'Mis Vacantes', active: true }
+    ];
 
     // Eliminar vacante
     const handleEliminar = async (vacanteId) => {
@@ -67,6 +73,9 @@ function VacantesEmpresa() {
         <div className="min-h-screen flex flex-col bg-[#f6f4fa]">
             <Navbar />
             <main className="flex-1 flex flex-col items-center pt-24 pb-10 px-4">
+                <div className="w-full max-w-6xl mb-6">
+                    <Breadcrumbs items={breadcrumbItems} />
+                </div>
                 <h1 className="text-3xl font-bold text-[#A67AFF] mb-6">Vacantes publicadas</h1>
                 <FormVacanteEmpresa
                     onSuccess={() => {

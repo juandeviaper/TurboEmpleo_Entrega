@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { FaBars, FaTimes, FaUserCircle, FaSearch, FaBriefcase, FaBuilding, FaBlog, FaEnvelope } from 'react-icons/fa';
 import logo from '../assets/img/Logo/claro/logotipo.png';
+import NotificationBell from './NotificationBell';
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -50,7 +51,7 @@ function Navbar() {
           <FaBriefcase /> Vacantes
         </Link>
       ) : (
-        <Link to="/vacantes" className="text-gray-600 hover:text-[#5e17eb] transition-colors font-medium flex items-center gap-1">
+        <Link to="/login" className="text-gray-600 hover:text-[#5e17eb] transition-colors font-medium flex items-center gap-1">
           <FaBriefcase /> Vacantes
         </Link>
       )}
@@ -59,13 +60,13 @@ function Navbar() {
           <FaBuilding /> Dashboard
         </Link>
       ) : (
-        <Link to="/empresas" className="text-gray-600 hover:text-[#5e17eb] transition-colors font-medium flex items-center gap-1">
+        <Link to="/register" className="text-gray-600 hover:text-[#5e17eb] transition-colors font-medium flex items-center gap-1">
           <FaBuilding /> Empresas
         </Link>
       )}
-      <Link to="/blog" className="text-gray-600 hover:text-[#5e17eb] transition-colors font-medium flex items-center gap-1">
+      <span className="text-gray-400 cursor-not-allowed font-medium flex items-center gap-1" title="Próximamente">
         <FaBlog /> Blog
-      </Link>
+      </span>
       <Link to="/contacto" className="text-gray-600 hover:text-[#5e17eb] transition-colors font-medium flex items-center gap-1">
         <FaEnvelope /> Contacto
       </Link>
@@ -170,6 +171,7 @@ function Navbar() {
           <div className="hidden md:flex items-center space-x-8">
             {mainLinks}
             <div className="flex items-center space-x-4">
+              {isAuth && <NotificationBell />}
               {isAuth ? userLinks : guestLinks}
             </div>
           </div>

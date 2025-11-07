@@ -9,6 +9,8 @@ import CompletarPerfilAspirante from './pages/aspirantes/CompletarPerfilAspirant
 import PoliticaPrivacidad from './pages/public/PoliticaPrivacidad';
 import TerminosUso from './pages/public/TerminosUso';
 import PoliticaDatos from './pages/public/PoliticaDatos';
+import Notificaciones from './pages/Notificaciones';
+import Contacto from './pages/public/Contacto';
 // src/App.jsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
@@ -49,6 +51,9 @@ function App() {
   <Route path="/PoliticaPrivacidad" element={<Layout><PoliticaPrivacidad /></Layout>} />
   <Route path="/TerminosUso" element={<Layout><TerminosUso /></Layout>} />
   <Route path="/PoliticaDatos" element={<Layout><PoliticaDatos /></Layout>} />
+  
+  {/* Ruta de contacto */}
+  <Route path="/contacto" element={<Layout><Contacto /></Layout>} />
 
         {/* Rutas privadas (admin) */}
         <Route path="/admin" element={<Admin />} />
@@ -73,6 +78,8 @@ function App() {
   <Route path="/aspirantes/vacantes/:id" element={<DetalleVacante />} />
   <Route path="/aspirantes/postulaciones" element={<PostulacionesAspirante />} />
   <Route path="/aspirantes/postulaciones/:id" element={<DetallePostulacion />} />
+  {/* Ruta de notificaciones */}
+  <Route path="/notificaciones" element={<Notificaciones />} />
       </Routes>
     </BrowserRouter>
   );

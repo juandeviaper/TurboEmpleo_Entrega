@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function Login() {
   const [userNombre, setUserNombre] = useState("");
@@ -249,8 +250,8 @@ function Login() {
           </form>
           
           <div className="w-full flex flex-col md:flex-row justify-between items-center gap-2 text-sm mt-6 pt-4 border-t border-gray-100">
-            <a href="/recuperar-password" className="text-[#5e17eb] hover:text-[#A67AFF] transition-colors font-medium">¿Olvidaste tu contraseña?</a>
-            <a href="/register" className="text-[#5e17eb] hover:text-[#A67AFF] transition-colors font-medium">¿No tienes cuenta? Regístrate</a>
+            <Link to="/recuperar-password" className="text-[#5e17eb] hover:text-[#A67AFF] transition-colors font-medium">¿Olvidaste tu contraseña?</Link>
+            <Link to="/register" className="text-[#5e17eb] hover:text-[#A67AFF] transition-colors font-medium">¿No tienes cuenta? Regístrate</Link>
           </div>
         </div>
         
@@ -258,8 +259,8 @@ function Login() {
         <div className="mt-8 text-center text-sm text-gray-600">
           <p>© 2025 TurboEmpleo. Todos los derechos reservados.</p>
           <div className="mt-2 flex justify-center space-x-4">
-            <a href="#" className="text-gray-500 hover:text-[#5e17eb] transition-colors">Términos y condiciones</a>
-            <a href="#" className="text-gray-500 hover:text-[#5e17eb] transition-colors">Política de privacidad</a>
+            <Link to="/TerminosUso" className="text-gray-500 hover:text-[#5e17eb] transition-colors">Términos y condiciones</Link>
+            <Link to="/PoliticaPrivacidad" className="text-gray-500 hover:text-[#5e17eb] transition-colors">Política de privacidad</Link>
           </div>
         </div>
       </div>

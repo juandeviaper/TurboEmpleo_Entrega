@@ -37,13 +37,13 @@ const LandingPage = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 pt-2">
                 <Link 
-                  to="/vacantes" 
+                  to="/login" 
                   className="px-8 py-4 bg-[#ffde59] text-[#5e17eb] font-bold rounded-full hover:bg-opacity-90 transition-all transform hover:scale-105 text-center shadow-lg"
                 >
                   Buscar Empleo
                 </Link>
                 <Link 
-                  to="/empresas" 
+                  to="/register" 
                   className="px-8 py-4 bg-white text-[#5e17eb] font-bold rounded-full hover:bg-gray-100 transition-all transform hover:scale-105 text-center shadow-lg"
                 >
                   Publicar Vacante
@@ -213,7 +213,7 @@ const LandingPage = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">Hace 2 días</span>
-                  <Link to={`/vacantes/1`} className="px-4 py-2 bg-[#5e17eb] text-white rounded-full hover:bg-opacity-90">Ver detalles</Link>
+                  <Link to="/login" className="px-4 py-2 bg-[#5e17eb] text-white rounded-full hover:bg-opacity-90">Ver detalles</Link>
                 </div>
               </div>
             </div>
@@ -245,8 +245,8 @@ const LandingPage = () => {
                   <span className="px-3 py-1 bg-purple-100 text-[#5e17eb] text-xs rounded-full">B2B</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500">Hace 1 día</span>
-                  <Link to={`/vacantes/2`} className="px-4 py-2 bg-[#5e17eb] text-white rounded-full hover:bg-opacity-90">Ver detalles</Link>
+                  <span className="text-sm text-gray-500">Hace 1 semana</span>
+                  <Link to="/login" className="px-4 py-2 bg-[#5e17eb] text-white rounded-full hover:bg-opacity-90">Ver detalles</Link>
                 </div>
               </div>
             </div>
@@ -279,14 +279,14 @@ const LandingPage = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">Hace 3 días</span>
-                  <Link to={`/vacantes/3`} className="px-4 py-2 bg-[#5e17eb] text-white rounded-full hover:bg-opacity-90">Ver detalles</Link>
+                  <Link to="/login" className="px-4 py-2 bg-[#5e17eb] text-white rounded-full hover:bg-opacity-90">Ver detalles</Link>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="text-center mt-10">
-            <Link to="/vacantes" className="px-8 py-3 bg-white border border-[#5e17eb] text-[#5e17eb] font-semibold rounded-full hover:bg-[#5e17eb] hover:text-white transition-colors">
+            <Link to="/login" className="px-8 py-3 bg-white border border-[#5e17eb] text-[#5e17eb] font-semibold rounded-full hover:bg-[#5e17eb] hover:text-white transition-colors">
               Ver todas las vacantes
             </Link>
           </div>
@@ -340,7 +340,7 @@ const LandingPage = () => {
               <p className="text-lg mb-6">
                 Publica tus vacantes, gestiona postulaciones y encuentra a los mejores profesionales para tu equipo. Ofrecemos planes flexibles para empresas de todos los tamaños.
               </p>
-              <Link to="/empresas" className="px-8 py-3 bg-white text-[#5e17eb] font-semibold rounded-full hover:bg-[#ffde59] transition-colors inline-block">
+              <Link to="/register" className="px-8 py-3 bg-white text-[#5e17eb] font-semibold rounded-full hover:bg-[#ffde59] transition-colors inline-block">
                 Publicar Vacante Ahora
               </Link>
             </div>
@@ -434,7 +434,7 @@ const LandingPage = () => {
                 <p className="text-gray-600 mb-4">Consejos prácticos para destacar en tu próxima entrevista y conseguir el trabajo que deseas.</p>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">Mayo 15, 2025</span>
-                  <Link to="/blog/1" className="text-[#5e17eb] font-medium hover:underline">Leer más</Link>
+                  <a href="#" onClick={(e) => e.preventDefault()} className="text-[#5e17eb] font-medium hover:underline cursor-default">Próximamente</a>
                 </div>
               </div>
             </div>
@@ -447,7 +447,7 @@ const LandingPage = () => {
                 <p className="text-gray-600 mb-4">Descubre cuáles son las competencias profesionales más valoradas por las empresas actualmente.</p>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">Mayo 8, 2025</span>
-                  <Link to="/blog/2" className="text-[#5e17eb] font-medium hover:underline">Leer más</Link>
+                  <a href="#" onClick={(e) => e.preventDefault()} className="text-[#5e17eb] font-medium hover:underline cursor-default">Próximamente</a>
                 </div>
               </div>
             </div>
@@ -460,16 +460,20 @@ const LandingPage = () => {
                 <p className="text-gray-600 mb-4">Guía paso a paso para elaborar un currículum efectivo que destaque entre la competencia.</p>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">Mayo 1, 2025</span>
-                  <Link to="/blog/3" className="text-[#5e17eb] font-medium hover:underline">Leer más</Link>
+                  <a href="#" onClick={(e) => e.preventDefault()} className="text-[#5e17eb] font-medium hover:underline cursor-default">Próximamente</a>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="text-center mt-10">
-            <Link to="/blog" className="px-8 py-3 border border-[#5e17eb] text-[#5e17eb] font-semibold rounded-full hover:bg-[#5e17eb] hover:text-white transition-colors">
-              Ver todos los artículos
-            </Link>
+            <button 
+              onClick={(e) => e.preventDefault()} 
+              className="px-8 py-3 border border-gray-400 text-gray-400 font-semibold rounded-full cursor-not-allowed"
+              disabled
+            >
+              Blog Próximamente
+            </button>
           </div>
         </div>
       </div>

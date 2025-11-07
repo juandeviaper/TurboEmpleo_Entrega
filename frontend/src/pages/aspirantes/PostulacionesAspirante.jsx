@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from '../../components/navbar';
 import Footer from '../../components/footer';
+import Breadcrumbs from '../../components/Breadcrumbs';
 import { FaMapMarkerAlt, FaDollarSign, FaClock, FaBuilding } from 'react-icons/fa';
 
 function PostulacionesAspirante() {
@@ -11,6 +12,11 @@ function PostulacionesAspirante() {
     const token = localStorage.getItem("token");
     const userData = JSON.parse(localStorage.getItem("user_data") || "null");
     const navigate = useNavigate();
+
+    const breadcrumbItems = [
+        { label: 'Dashboard', path: '/aspirantes/dashboard' },
+        { label: 'Mis Postulaciones', active: true }
+    ];
 
     useEffect(() => {
         if (!userData?.id) return;
@@ -32,6 +38,9 @@ function PostulacionesAspirante() {
         <>
             <Navbar />
             <div className="min-h-screen flex flex-col bg-[#f6f4fa] items-center py-10 pt-24">
+                <div className="w-full max-w-6xl px-4">
+                    <Breadcrumbs items={breadcrumbItems} />
+                </div>
                 <h1 className="text-3xl font-bold text-[#A67AFF] mb-6">Mis Postulaciones</h1>
                 {loading ? (
                     <div>Cargando postulaciones...</div>

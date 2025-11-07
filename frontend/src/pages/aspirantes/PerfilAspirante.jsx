@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
+import Breadcrumbs from "../../components/Breadcrumbs";
 
 function PerfilAspirante() {
     const [form, setForm] = useState(null);
@@ -11,6 +12,12 @@ function PerfilAspirante() {
     const fileInputRef = useRef();
     const fotoInputRef = useRef();
     const [sidebarSection, setSidebarSection] = useState("datos"); // 'datos' o 'config'
+
+    const breadcrumbItems = [
+        { label: 'Dashboard', path: '/aspirantes/dashboard' },
+        { label: 'Mi Perfil', active: true }
+    ];
+
     // Previsualizar la foto seleccionada
     useEffect(() => {
         if (fotoFile) {
@@ -173,7 +180,11 @@ function PerfilAspirante() {
     return (
         <div className="min-h-screen flex flex-col bg-[#f6f4fa]">
             <Navbar />
-            <main className="flex-1 flex flex-row justify-center pt-24 pb-10 px-4">
+            <main className="flex-1 flex flex-col items-center pt-24 pb-10 px-4">
+                <div className="w-full max-w-7xl mb-6">
+                    <Breadcrumbs items={breadcrumbItems} />
+                </div>
+                <div className="flex flex-row justify-center w-full max-w-7xl">
                 {/* Sidebar */}
                 <aside className="w-64 bg-white rounded-2xl shadow-xl p-6 mr-8 h-fit sticky top-24 border-t-4 border-[#5e17eb] flex flex-col gap-4">
                     <button
@@ -419,6 +430,7 @@ function PerfilAspirante() {
                         </div>
                     )}
                 </section>
+                </div>
             </main>
             <Footer />
         </div>

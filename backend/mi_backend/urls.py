@@ -9,7 +9,7 @@ from usuarios.views import (
     UsuarioViewSet, AspiranteViewSet, EmpresaViewSet,
     VacanteViewSet, UsuarioRegistroView, MyTokenObtainPairView,
     ExperienciaLaboralViewSet, ExperienciaEscolarViewSet,
-    PostulacionViewSet
+    PostulacionViewSet, NotificacionViewSet
 )
 
 # Crea un enrutador (router)
@@ -24,6 +24,7 @@ router.register(r'vacantes', VacanteViewSet)
 router.register(r'experiencia_laboral', ExperienciaLaboralViewSet)
 router.register(r'experiencia_escolar', ExperienciaEscolarViewSet)
 router.register(r'postulaciones', PostulacionViewSet)
+router.register(r'notificaciones', NotificacionViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

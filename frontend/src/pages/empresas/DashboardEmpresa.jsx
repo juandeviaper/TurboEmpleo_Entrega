@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
+import Breadcrumbs from "../../components/Breadcrumbs";
 import { FaBuilding, FaBriefcase, FaFileAlt } from 'react-icons/fa';
 
 
@@ -14,11 +15,17 @@ const DashboardEmpresa = () => {
         }
     } catch (e) {}
 
+    const breadcrumbItems = [
+        { label: 'Dashboard', active: true }
+    ];
+
     return (
     <div className="min-h-screen flex flex-col bg-[#f6f4fa]">
         <Navbar />
         <main className="flex-1 flex flex-col items-center justify-start pt-24 pb-10 px-4">
-        <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-8 border-t-4 border-[#A67AFF]">
+        <div className="w-full max-w-4xl">
+            <Breadcrumbs items={breadcrumbItems} />
+            <div className="bg-white rounded-2xl shadow-xl p-8 border-t-4 border-[#A67AFF]">
             <h1 className="text-3xl md:text-4xl font-bold text-[#A67AFF] mb-2 text-center">
             ¡Bienvenido, {nombre}!
             </h1>
@@ -46,6 +53,7 @@ const DashboardEmpresa = () => {
                 <a href="/empresas/postulaciones" className="mt-2 px-4 py-2 bg-[#A67AFF] text-white rounded-lg font-semibold hover:bg-[#5e17eb] transition">Ver postulaciones</a>
             </div>
             </div>
+        </div>
         </div>
         </main>
         <Footer />
