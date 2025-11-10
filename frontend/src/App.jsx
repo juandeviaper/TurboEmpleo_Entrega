@@ -12,7 +12,7 @@ import PoliticaDatos from './pages/public/PoliticaDatos';
 import Notificaciones from './pages/Notificaciones';
 import Contacto from './pages/public/Contacto';
 // src/App.jsx
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts
 import Layout from './components/layout';
@@ -26,26 +26,74 @@ import Register from './pages/public/Register';
 // Vistas privadas (admin)
 import Admin from './pages/admin/Admin';
 import Aspirantes from './pages/aspirantes/Aspirantes';
-import DashboardAspirante from './pages/aspirantes/DashboardAspirante';
 import PerfilAspirante from './pages/aspirantes/PerfilAspirante';
 import Empresas from './pages/empresas/Empresas';
-import DashboardRedirect from './pages/DashboardRedirect';
-
-
 import DashboardEmpresa from './pages/empresas/DashboardEmpresa';
 import PerfilEmpresa from './pages/empresas/PerfilEmpresa';
 import VacantesEmpresa from './pages/empresas/VacantesEmpresa';
 import EditarVacanteEmpresa from './pages/empresas/EditarVacanteEmpresa';
 import PostulacionesRecibidasEmpresa from './pages/empresas/PostulacionesRecibidasEmpresa';
 
+// Helper para determinar rol del usuario de forma robusta
+const getUserRole = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  let userData = null;
+  try {
+    userData = JSON.parse(localStorage.getItem("user_data") || "null");
+  } catch (e) {
+    userData = null;
+  }
+  if (!userData) return null;
+
+  // Detectar por campos específicos (compatibilidad con distintos formatos)
+  if (userData.asp_nombre || userData.asp_correo || userData.asp_curriculum) return 'Aspirante';
+  if (userData.em_nombre || userData.em_email || userData.em_nit) return 'Empresa';
+  if (userData.user_rol_fk && userData.user_rol_fk.rol_nombre) return userData.user_rol_fk.rol_nombre;
+  return null;
+};
+
+// Componente de redirección basado en el rol (usa getUserRole)
+const RedirectByRole = () => {
+  const role = getUserRole();
+  const token = localStorage.getItem("token");
+
+  if (!token || !role) {
+    // Si no hay token o no podemos identificar rol, mostrar landing
+    return <Layout><LandingPage /></Layout>;
+  }
+
+  if (role === 'Aspirante') return <Navigate to="/aspirantes/vacantes" replace />;
+  if (role === 'Empresa') return <Navigate to="/empresas/dashboard" replace />;
+
+  // Fallback: mostrar landing
+  return <Layout><LandingPage /></Layout>;
+};
+
+// Componente protector para rutas públicas (redirige si ya autenticado)
+const PublicRoute = ({ children }) => {
+  const role = getUserRole();
+  const token = localStorage.getItem("token");
+
+  if (token && role) {
+    if (role === 'Aspirante') return <Navigate to="/aspirantes/vacantes" replace />;
+    if (role === 'Empresa') return <Navigate to="/empresas/dashboard" replace />;
+  }
+
+  // Si hay token pero no rol detectado, evitar mostrar landing a usuarios autenticados
+  if (token && !role) return <Navigate to="/aspirantes/vacantes" replace />;
+
+  return children;
+};
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         {/* Rutas públicas */}
-        <Route path="/" element={<Layout><LandingPage /></Layout>} />
-  <Route path="/login" element={<><Navbar /><Login /></>} />
-        <Route path="/register" element={<Layout><Register /></Layout>} />
+        <Route path="/" element={<RedirectByRole />} />
+        <Route path="/login" element={<PublicRoute><Layout><Login /></Layout></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><Layout><Register /></Layout></PublicRoute>} />
 
   {/* Rutas legales */}
   <Route path="/PoliticaPrivacidad" element={<Layout><PoliticaPrivacidad /></Layout>} />
@@ -59,12 +107,14 @@ function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/aspirantes" element={<Aspirantes />} />
         <Route path="/admin/empresas" element={<Empresas />} />
-  {/* Dashboard privado del aspirante */}
-  <Route path="/aspirantes/dashboard" element={<DashboardAspirante />} />
+  {/* Rutas del módulo de aspirantes */}
   <Route path="/aspirantes/perfil" element={<PerfilAspirante />} />
-  {/* Redirección inteligente para /dashboard */}
-  <Route path="/dashboard" element={<DashboardRedirect />} />
-        <Route path="/aspirantes/completar-perfil" element={<CompletarPerfilAspirante />} />
+  <Route path="/aspirantes/completar-perfil" element={<CompletarPerfilAspirante />} />
+  <Route path="/aspirantes/vacantes" element={<VacantesDisponibles />} />
+  <Route path="/aspirantes/vacantes/:id" element={<DetalleVacante />} />
+  <Route path="/aspirantes/postulaciones" element={<PostulacionesAspirante />} />
+  <Route path="/aspirantes/postulaciones/:id" element={<DetallePostulacion />} />
+  <Route path="/aspirantes/dashboard" element={<Navigate to="/aspirantes/vacantes" replace />} />
         {/* Activación de cuenta */}
     <Route path="/activar-cuenta/:uidb64/:token" element={<Layout><ActivarCuenta /></Layout>} />
   <Route path="/recuperar-password" element={<Layout><RecuperarPassword /></Layout>} />

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from '../../components/navbar';
+import AspiranteNavbar from '../../components/AspiranteNavbar';
 import Footer from '../../components/footer';
 import Breadcrumbs from '../../components/Breadcrumbs';
-import { FaBuilding } from 'react-icons/fa';
+import { FaBuilding, FaMapMarkerAlt, FaDollarSign, FaBriefcase, FaClock } from 'react-icons/fa';
 
 function VacantesDisponibles() {
     const navigate = useNavigate();
@@ -19,7 +19,7 @@ function VacantesDisponibles() {
     const [filtroBusqueda, setFiltroBusqueda] = useState("");
 
     const breadcrumbItems = [
-        { label: 'Dashboard', path: '/aspirantes/dashboard' },
+        { label: 'Inicio', path: '/aspirantes/vacantes' },
         { label: 'Vacantes Disponibles', active: true }
     ];
 
@@ -58,6 +58,15 @@ function VacantesDisponibles() {
             return res.json();
         })
         .then((data) => {
+            console.log("Datos de vacantes:", data);
+            // Si hay vacantes, imprimir la primera para ver su estructura
+            if (Array.isArray(data) && data.length > 0) {
+                console.log("Primera vacante:", data[0]);
+                console.log("Datos de empresa:", data[0].va_idEmpresa_fk);
+                if (data[0].va_idEmpresa_fk) {
+                    console.log("Logo de empresa:", data[0].va_idEmpresa_fk.em_logo);
+                }
+            }
             setVacantes(Array.isArray(data) ? data : []);
             setLoading(false);
         })
@@ -109,16 +118,18 @@ function VacantesDisponibles() {
 
     return (
         <>
-            <Navbar />
-            <div className="min-h-screen flex flex-col bg-[#f6f4fa] items-center py-10 pt-24">
+            <AspiranteNavbar />
+            <div className="min-h-screen flex flex-col bg-[#f6f4fa] items-center py-6 pt-20 sm:py-10 sm:pt-24">
                 <div className="w-full max-w-6xl px-4">
-                    <Breadcrumbs items={breadcrumbItems} />
-                    <h1 className="text-3xl font-bold text-[#A67AFF] mb-6">Vacantes disponibles</h1>
+                    <div className="mb-4 sm:mb-6">
+                        <Breadcrumbs items={breadcrumbItems} />
+                        <h1 className="text-2xl sm:text-3xl font-bold text-[#A67AFF] mt-4">Vacantes disponibles</h1>
+                    </div>
                 
                 {/* Panel de Filtros */}
-                <div className="w-full max-w-6xl bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-[#5e17eb]">
-                    <h2 className="text-xl font-bold text-[#5e17eb] mb-4">Filtrar vacantes</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="w-full max-w-6xl bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-6 border-t-4 border-[#5e17eb]">
+                    <h2 className="text-lg sm:text-xl font-bold text-[#5e17eb] mb-4">Filtrar vacantes</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-1">Búsqueda</label>
                             <input
@@ -158,7 +169,7 @@ function VacantesDisponibles() {
                         <div className="flex items-end">
                             <button
                                 onClick={limpiarFiltros}
-                                className="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition font-semibold"
+                                className="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition font-semibold text-sm sm:text-base"
                             >
                                 Borrar filtros
                             </button>
@@ -176,7 +187,7 @@ function VacantesDisponibles() {
                 ) : vacantes.length === 0 ? (
                     <div>No hay vacantes disponibles con los filtros seleccionados.</div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 w-full max-w-6xl">
                         {vacantes.map((vac) => {
                             // Obtener datos de empresa (nombre y logo)
                             const empresa = vac.va_idEmpresa_fk;
@@ -191,39 +202,103 @@ function VacantesDisponibles() {
                             const fecha = vac.va_fecha_publicacion ? new Date(vac.va_fecha_publicacion) : null;
                             const fechaStr = fecha ? fecha.toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
                             return (
-                                <div key={vac.id} className="bg-white rounded-xl shadow p-6 flex flex-col gap-2 border-t-4 border-[#A67AFF]">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        {empresa && empresa.em_logo ? (
-                                            <img src={empresa.em_logo} alt="Logo empresa" className="w-12 h-12 rounded-full object-cover border" />
-                                        ) : (
-                                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center text-purple-600 border-2 border-purple-300">
-                                                <FaBuilding className="text-xl" />
+                                <div key={vac.id} className="bg-white rounded-xl shadow-md overflow-hidden transform transition-transform hover:-translate-y-1">
+                                    <div className="p-6">
+                                        <div className="flex items-center mb-4">
+                                            <div className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden">
+                                                {empresa && empresa.em_logo ? (
+                                                    <img 
+                                                        src={`http://127.0.0.1:8000/media/logos_empresas/${empresa.em_logo}`}
+                                                        alt={`Logo de ${empresa.em_nombre || 'empresa'}`} 
+                                                        className="w-full h-full object-contain rounded-lg"
+                                                        onError={(e) => {
+                                                            console.log("Error al cargar logo:", e.target.src);
+                                                            e.target.onerror = null;
+                                                            e.target.style.display = 'none';
+                                                            // Crear un elemento para el gradiente de fondo
+                                                            const gradient = document.createElement('div');
+                                                            gradient.className = 'absolute inset-0 bg-gradient-to-br from-[#5e17eb]/5 to-[#A67AFF]/5';
+                                                            e.target.parentElement.appendChild(gradient);
+                                                            
+                                                            // Crear el círculo con la inicial
+                                                            const circle = document.createElement('div');
+                                                            circle.className = 'relative w-full h-full rounded-lg bg-white/50 backdrop-blur-sm flex items-center justify-center';
+                                                            circle.innerHTML = `
+                                                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#5e17eb] to-[#A67AFF] flex items-center justify-center shadow-lg">
+                                                                    <span class="text-lg font-bold text-white">
+                                                                        ${(empresa.em_nombre || 'E').charAt(0).toUpperCase()}
+                                                                    </span>
+                                                                </div>
+                                                            `;
+                                                            e.target.parentElement.appendChild(circle);
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div className="relative w-full h-full">
+                                                        <div className="absolute inset-0 bg-gradient-to-br from-[#5e17eb]/5 to-[#A67AFF]/5"></div>
+                                                        <div className="relative w-full h-full rounded-lg bg-white/50 backdrop-blur-sm flex items-center justify-center">
+                                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5e17eb] to-[#A67AFF] flex items-center justify-center shadow-lg">
+                                                                <span className="text-lg font-bold text-white">
+                                                                    {(empresa && empresa.em_nombre ? empresa.em_nombre.charAt(0) : 'E').toUpperCase()}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="ml-4">
+                                                <h3 className="text-xl font-semibold">{vac.va_titulo}</h3>
+                                                <p className="text-gray-600">{empresa && empresa.em_nombre ? empresa.em_nombre : 'Empresa'}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center text-sm text-gray-600 mb-3">
+                                            <FaMapMarkerAlt className="mr-2 text-[#5e17eb]" />
+                                            <span>{vac.va_ubicacion} {vac.va_barrio && `(${vac.va_barrio})`}</span>
+                                        </div>
+                                        
+                                        <div className="flex items-center text-sm text-gray-600 mb-3">
+                                            <FaBriefcase className="mr-2 text-[#5e17eb]" />
+                                            <span>{vac.va_tipo_empleo || "Tiempo completo"}</span>
+                                        </div>
+
+                                        <div className="flex items-center text-sm text-gray-600 mb-4">
+                                            <FaDollarSign className="mr-2 text-[#5e17eb]" />
+                                            <span>${vac.va_salario}</span>
+                                        </div>
+
+                                        <p className="text-gray-700 mb-6 line-clamp-3">
+                                            {vac.va_descripcion}
+                                        </p>
+
+                                        {habilidades.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 mb-6">
+                                                {habilidades.map((hab, idx) => (
+                                                    <span key={idx} className="px-3 py-1 bg-purple-100 text-[#5e17eb] text-xs rounded-full">
+                                                        {hab}
+                                                    </span>
+                                                ))}
                                             </div>
                                         )}
-                                        <div>
-                                            <div className="font-bold text-lg text-[#5e17eb]">{vac.va_titulo}</div>
-                                            <div className="text-gray-700 font-semibold text-sm">{empresa && empresa.em_nombre ? empresa.em_nombre : 'Empresa'}</div>
+
+                                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                            <span className="text-sm text-gray-500 order-2 sm:order-1">Publicado: {fechaStr}</span>
+                                            <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto order-1 sm:order-2">
+                                                <button
+                                                    className="w-full xs:w-auto px-4 py-2 bg-[#5e17eb] text-white text-sm rounded-full hover:bg-opacity-90 transition whitespace-nowrap"
+                                                    onClick={() => navigate(`/aspirantes/vacantes/${vac.id}`)}
+                                                >
+                                                    Ver detalles
+                                                </button>
+                                                <button
+                                                    className="w-full xs:w-auto px-4 py-2 border border-[#5e17eb] text-[#5e17eb] text-sm rounded-full hover:bg-[#5e17eb] hover:text-white transition whitespace-nowrap"
+                                                    onClick={() => handlePostular(vac.id)}
+                                                >
+                                                    Postularme
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="text-gray-700 font-semibold">Ubicación: <span className="font-normal">{vac.va_ubicacion}</span></div>
-                                    <div className="text-gray-700 font-semibold">Salario: <span className="font-normal">${vac.va_salario}</span></div>
-                                    <div className="text-gray-700 font-semibold">Descripción:</div>
-                                    <div className="text-gray-600 text-sm mb-1">{vac.va_descripcion}</div>
-                                    {habilidades.length > 0 && (
-                                        <div className="flex flex-wrap gap-2 mb-1">
-                                            {habilidades.map((hab, idx) => (
-                                                <span key={idx} className="bg-[#f3e8ff] text-[#5e17eb] px-2 py-1 rounded text-xs font-medium">{hab}</span>
-                                            ))}
-                                        </div>
-                                    )}
-                                    <div className="text-gray-400 text-xs mt-2">Publicado: {fechaStr}</div>
-                                    {/* Botón Ver detalles (próxima iteración) */}
-                                    <button
-                                        className="mt-2 px-4 py-1 bg-[#A67AFF] text-white rounded hover:bg-[#5e17eb] transition"
-                                        onClick={() => navigate(`/aspirantes/vacantes/${vac.id}`)}
-                                    >
-                                        Ver detalles
-                                    </button>
                                 </div>
                             );
                         })}

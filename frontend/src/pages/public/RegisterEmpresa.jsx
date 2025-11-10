@@ -1,19 +1,21 @@
 import { Link } from 'react-router-dom';
-// ...existing code...
-
 import React, { useRef, useState } from "react";
+import UbicacionSelect from "../../components/UbicacionSelect";
 
-function RegisterEmpresa() {
+function RegisterEmpresa({ embedded = false, onSuccess }) {
   const fileInputRef = useRef();
   const [form, setForm] = useState({
     nombreEmpresa: "",
     nit: "",
     email: "",
     telefono: "",
-    departamento: "",
-    ciudad: "",
+    localidad: "",
+    barrio: "",
+    localidadNombre: "",
+    barrioNombre: "",
     sector: "",
     contacto: "",
+    nombreUsuario: "",
     password: "",
     descripcion: "",
     sitioWeb: "",
@@ -26,6 +28,25 @@ function RegisterEmpresa() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [aceptaDatos, setAceptaDatos] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleLocalidadChange = (localidadId, nombre) => {
+    setForm(f => ({
+      ...f,
+      localidad: localidadId,
+      localidadNombre: nombre,
+      barrio: "",
+      barrioNombre: ""
+    }));
+  };
+
+  const handleBarrioChange = (barrioId, nombre) => {
+    setForm(f => ({
+      ...f,
+      barrio: barrioId,
+      barrioNombre: nombre
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -47,117 +68,177 @@ function RegisterEmpresa() {
     e.preventDefault();
     setError("");
     setSuccess("");
+    
+    // Validaciones básicas en frontend
     if (!aceptaDatos) {
       setError("Debes aceptar el tratamiento de datos personales para continuar.");
       return;
     }
-    // Validaciones básicas en frontend
+
+    // Validar campos requeridos
+    if (!form.email || !form.password || !form.nombreEmpresa || !form.nit || !form.telefono || !form.sitioWeb) {
+      setError("Por favor completa todos los campos requeridos.");
+      return;
+    }
+    
+    // Validar formato de correo
     if (!form.email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
       setError("El correo electrónico no es válido.");
       return;
     }
+    
+    // Validar contraseña
     if (form.password.length < 8) {
       setError("La contraseña debe tener al menos 8 caracteres.");
       return;
     }
-    if (!form.nit) {
-      setError("El NIT es obligatorio.");
-      return;
-    }
+    
+    // Validar NIT
     if (!/^[0-9]+$/.test(form.nit)) {
       setError("El NIT solo puede contener números.");
       return;
     }
-    if (form.telefono.length < 7) {
+    
+    // Validar teléfono
+    if (form.telefono.length < 7 || !/^[0-9]+$/.test(form.telefono)) {
       setError("El teléfono debe tener al menos 7 dígitos y solo números.");
       return;
     }
-    if (!/^[0-9]+$/.test(form.telefono)) {
-      setError("El teléfono solo puede contener números.");
-      return;
-    }
-    if (!form.sitioWeb) {
-      setError("El sitio web es obligatorio.");
-      return;
-    }
+    
+    // Validar sitio web
     if (!/^https?:\/\/.+\..+/.test(form.sitioWeb)) {
       setError("La URL del sitio web no es válida. Debe comenzar con http:// o https://");
       return;
     }
-    const formData = new FormData();
-    formData.append('user_nombre', form.nombreEmpresa); // Usar nombre de empresa como usuario
-    formData.append('user_contraseña', form.password);
-    formData.append('user_rol', 'Empresa');
-    formData.append('em_nombre', form.nombreEmpresa);
-    formData.append('em_nit', form.nit);
-    formData.append('em_email', form.email);
-    formData.append('em_telefono', form.telefono);
-    formData.append('em_departamento', form.departamento);
-    formData.append('em_ciudad', form.ciudad);
-    formData.append('em_sector', form.sector);
-    formData.append('em_contacto', form.contacto);
-    formData.append('em_password', form.password);
-    formData.append('em_descripcion', form.descripcion);
-    formData.append('em_sitioWeb', form.sitioWeb);
-    formData.append('em_tamano', form.tamano);
-    formData.append('em_direccion', form.direccion);
-    if (form.curriculum) formData.append('em_curriculum', form.curriculum);
-    if (form.logo) formData.append('em_logo', form.logo);
-    if (form.idiomas && form.idiomas.length > 0) {
-      formData.append('em_idiomas', JSON.stringify(form.idiomas));
-    }
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/registro/', {
+      // Validar nombre de usuario
+      if (!form.nombreUsuario) {
+        setError("El nombre de usuario es obligatorio.");
+        return;
+      }
+      if (form.nombreUsuario.includes('@')) {
+        setError("El nombre de usuario no puede contener el símbolo @.");
+        return;
+      }
+      
+      const formData = new FormData();
+      
+      // Campos base de usuario según UsuarioRegistroSerializer
+      formData.append('user_nombre', form.nombreUsuario);
+      formData.append('user_contraseña', form.password);
+      formData.append('user_rol', 'empresa');
+
+      // Campos específicos de empresa según UsuarioRegistroSerializer
+      formData.append('em_nombre', form.nombreEmpresa);
+      formData.append('em_nit', form.nit);
+      formData.append('em_email', form.email);
+      formData.append('em_telefono', form.telefono);
+      formData.append('em_localidad', form.localidadNombre || '');
+      formData.append('em_barrio', form.barrioNombre || '');
+      formData.append('em_sector', form.sector);
+      formData.append('em_contacto', form.contacto);
+      formData.append('em_descripcion', form.descripcion);
+      formData.append('em_sitioWeb', form.sitioWeb);
+      formData.append('em_tamano', form.tamano);
+      formData.append('em_direccion', form.direccion);
+      
+      // Campos de archivos opcionales
+      if (form.curriculum) formData.append('em_curriculum', form.curriculum);
+      if (form.logo) formData.append('em_logo', form.logo);
+      
+      // Idiomas como JSON
+      if (form.idiomas && form.idiomas.length > 0) {
+        formData.append('em_idiomas', JSON.stringify(form.idiomas));
+      }
+
+      console.log('Enviando datos:', Object.fromEntries(formData.entries()));
+
+      const response = await fetch('http://localhost:8000/api/registro/', {
         method: 'POST',
         body: formData,
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+        }
       });
-      const data = await response.json();
-      if (response.ok) {
-        // Guardar token y user_data si vienen en la respuesta
-        if (data.token) {
-          localStorage.setItem('token', data.token);
-        }
-        if (data.user) {
-          localStorage.setItem('user_data', JSON.stringify(data.user));
-        }
-        setSuccess('¡Registro de empresa enviado exitosamente!');
-        setForm({
-          nombreEmpresa: "",
-          nit: "",
-          email: "",
-          telefono: "",
-          departamento: "",
-          ciudad: "",
-          sector: "",
-          contacto: "",
-          password: "",
-          descripcion: "",
-          sitioWeb: "",
-          tamano: "",
-          direccion: "",
-          curriculum: null,
-          logo: null,
-          idiomas: [],
-        });
+
+      let data;
+      const contentType = response.headers.get('content-type');
+      
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
       } else {
-        setError(data.message || data.detail || 'Error al registrar empresa');
+        const text = await response.text();
+        console.error('Respuesta no-JSON del servidor:', text);
+        throw new Error('El servidor respondió en un formato inesperado');
+      }
+
+      if (!response.ok) {
+        if (typeof data === 'object') {
+          // Si es un objeto de errores, mostrar el primer error que encontremos
+          const firstError = Object.values(data)[0];
+          if (Array.isArray(firstError)) {
+            setError(firstError[0]);
+          } else {
+            setError(firstError || 'Error al registrar empresa');
+          }
+        } else {
+          setError(data.detail || 'Error al registrar empresa');
+        }
+        return;
+      }
+      
+      // Si hay errores específicos del servidor, mostrarlos
+      if (!response.ok && data.detail) {
+        setError(data.detail);
+        return;
+      }
+      
+      // Si llegamos aquí, el registro fue exitoso
+      setSuccess('¡Registro de empresa enviado exitosamente! Por favor verifica tu correo electrónico para activar tu cuenta.');
+      setForm({
+        nombreEmpresa: "",
+        nit: "",
+        email: "",
+        telefono: "",
+        localidad: "",
+        barrio: "",
+        localidadNombre: "",
+        barrioNombre: "",
+        sector: "",
+        contacto: "",
+        password: "",
+        descripcion: "",
+        sitioWeb: "",
+        tamano: "",
+        direccion: "",
+        curriculum: null,
+        logo: null,
+        idiomas: [],
+      });
+
+      if (onSuccess) {
+        onSuccess();
       }
     } catch (err) {
-      setError('Error de conexión');
+      console.error('Error al registrar:', err);
+      setError('Error de conexión. Por favor intenta nuevamente.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f6f3ff] to-[#e9e4fa] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className={embedded ? "relative z-10 w-full" : "min-h-screen bg-gradient-to-br from-[#f6f3ff] to-[#e9e4fa] flex flex-col items-center justify-center p-4 relative overflow-hidden"}>
       {/* Elementos decorativos de fondo */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-0 left-0 w-full h-full opacity-5">
-          <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-[#5e17eb]"></div>
-          <div className="absolute top-40 right-20 w-24 h-24 rounded-full bg-[#ffde59]"></div>
-          <div className="absolute bottom-20 left-1/4 w-28 h-28 rounded-full bg-[#A67AFF]"></div>
-          <div className="absolute bottom-40 right-1/3 w-36 h-36 rounded-full bg-[#5e17eb]"></div>
+      {!embedded && (
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-0 left-0 w-full h-full opacity-5">
+            <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-[#5e17eb]"></div>
+            <div className="absolute top-40 right-20 w-24 h-24 rounded-full bg-[#ffde59]"></div>
+            <div className="absolute bottom-20 left-1/4 w-28 h-28 rounded-full bg-[#A67AFF]"></div>
+            <div className="absolute bottom-40 right-1/3 w-36 h-36 rounded-full bg-[#5e17eb]"></div>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="relative z-10 w-full max-w-4xl">
         <div className="text-center mb-8">
@@ -252,6 +333,27 @@ function RegisterEmpresa() {
                     />
                   </div>
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de usuario</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <input 
+                      name="nombreUsuario" 
+                      value={form.nombreUsuario} 
+                      onChange={handleChange} 
+                      type="text" 
+                      placeholder="Este será tu nombre de usuario para iniciar sesión"
+                      className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5e17eb] focus:border-transparent transition" 
+                      required 
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">No uses tu correo electrónico como nombre de usuario.</p>
+                </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
@@ -275,43 +377,13 @@ function RegisterEmpresa() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                    <input 
-                      name="departamento" 
-                      value={form.departamento} 
-                      onChange={handleChange} 
-                      type="text" 
-                      className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5e17eb] focus:border-transparent transition" 
-                      required 
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                    <input 
-                      name="ciudad" 
-                      value={form.ciudad} 
-                      onChange={handleChange} 
-                      type="text" 
-                      className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5e17eb] focus:border-transparent transition" 
-                      required 
-                    />
-                  </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación</label>
+                  <UbicacionSelect
+                    onLocalidadChange={handleLocalidadChange}
+                    onBarrioChange={handleBarrioChange}
+                    initialLocalidad={form.localidad}
+                    initialBarrio={form.barrio}
+                  />
                 </div>
               </div>
             </div>
@@ -371,10 +443,26 @@ function RegisterEmpresa() {
                       name="password" 
                       value={form.password} 
                       onChange={handleChange} 
-                      type="password" 
-                      className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5e17eb] focus:border-transparent transition" 
+                      type={showPassword ? "text" : "password"} 
+                      className="w-full pl-10 pr-12 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5e17eb] focus:border-transparent transition" 
                       required 
                     />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      ) : (
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                        </svg>
+                      )}
+                    </button>
                   </div>
                 </div>
                 

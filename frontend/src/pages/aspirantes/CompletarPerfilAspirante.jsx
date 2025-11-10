@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../components/navbar";
+import AspiranteNavbar from "../../components/AspiranteNavbar";
 import Footer from "../../components/footer";
-import { FaTimes, FaCheckCircle } from 'react-icons/fa';
+import Breadcrumbs from "../../components/Breadcrumbs";
+import UbicacionSelect from "../../components/UbicacionSelect";
+import { FaTimes, FaCheckCircle, FaGraduationCap, FaBriefcase } from 'react-icons/fa';
 
 function CompletarPerfilAspirante() {
     const navigate = useNavigate();
@@ -15,8 +17,25 @@ function CompletarPerfilAspirante() {
     const [expEscolar, setExpEscolar] = useState([
     { exes_nombreInstitucion: "", exes_titulo: "", exes_fechaInicio: "", exes_fechaFin: "", exes_description: "", exes_nivelEducativo: "" },
     ]);
+    const [localidad, setLocalidad] = useState("");
+    const [barrio, setBarrio] = useState("");
+    const [localidadNombre, setLocalidadNombre] = useState("");
+    const [barrioNombre, setBarrioNombre] = useState("");
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
+
+  // Handlers para ubicación
+  const handleLocalidadChange = (localidadId, nombre) => {
+    setLocalidad(localidadId);
+    setLocalidadNombre(nombre);
+    setBarrio("");
+    setBarrioNombre("");
+  };
+
+  const handleBarrioChange = (barrioId, nombre) => {
+    setBarrio(barrioId);
+    setBarrioNombre(nombre);
+  };
 
   // Handlers para experiencia laboral
     const handleLaboralChange = (i, e) => {
@@ -56,9 +75,22 @@ function CompletarPerfilAspirante() {
     setExpEscolar(expEscolar.filter((_, idx) => idx !== i));
     };
 
-  // Cargar experiencia laboral y escolar al montar
+  // Cargar datos del aspirante, experiencia laboral y escolar al montar
     useEffect(() => {
     if (!token || !aspiranteId) return;
+
+    // Cargar datos del aspirante
+    fetch(`http://127.0.0.1:8000/api/aspirantes/${aspiranteId}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+    })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+        if (data) {
+            setLocalidad(data.asp_localidad || "");
+            setBarrio(data.asp_barrio || "");
+        }
+        });
+
     // Experiencia Laboral
     fetch(`http://127.0.0.1:8000/api/experiencia_laboral/?exla_aspirante_fk=${aspiranteId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -89,6 +121,25 @@ function CompletarPerfilAspirante() {
     }
     
     try {
+      // Actualizar datos del aspirante
+      const aspResponse = await fetch(`http://127.0.0.1:8000/api/aspirantes/${aspiranteId}/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          asp_localidad: localidadNombre,
+          asp_barrio: barrioNombre,
+        }),
+      });
+
+      if (!aspResponse.ok) {
+        const errorData = await aspResponse.json();
+        console.error('Error al guardar datos del aspirante:', errorData);
+        throw new Error(errorData.detail || 'Error al guardar datos del aspirante');
+      }
+
       // Guardar experiencia laboral
         for (const exp of expLaboral) {
         const method = exp.id ? "PUT" : "POST";
@@ -170,13 +221,31 @@ function CompletarPerfilAspirante() {
 
     return (
     <div className="min-h-screen flex flex-col bg-[#f6f4fa]">
-        <Navbar />
-        <main className="flex-1 flex flex-col items-center justify-center pt-24 pb-10 px-4">
+        <AspiranteNavbar />
+        <main className="flex-1 flex flex-col items-center pt-24 pb-10 px-4">
+        <div className="w-full max-w-3xl mb-6">
+            <Breadcrumbs items={[
+                { label: 'Inicio', path: '/aspirantes/vacantes' },
+                { label: 'Mi Perfil', path: '/aspirantes/perfil' },
+                { label: 'Completar Perfil', active: true }
+            ]} />
+        </div>
         <h2 className="text-2xl font-bold text-[#5e17eb] mb-4 text-center">Completa tu perfil</h2>
         <p className="text-gray-600 text-center mb-8">Agrega tu experiencia laboral y escolar para mejorar tus oportunidades.</p>
         {success && <div className="w-full max-w-3xl bg-green-100 text-green-700 px-4 py-2 rounded mb-2 text-center border border-green-300">{success}</div>}
         {error && <div className="w-full max-w-3xl bg-red-100 text-red-700 px-4 py-2 rounded mb-2 text-center border border-red-300">{error}</div>}
         <form className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-10 border-t-4 border-[#5e17eb]" onSubmit={handleSubmit}>
+          {/* Ubicación */}
+          <div>
+            <h3 className="text-xl font-semibold text-[#5e17eb] mb-4">Ubicación</h3>
+            <UbicacionSelect
+              onLocalidadChange={handleLocalidadChange}
+              onBarrioChange={handleBarrioChange}
+              initialLocalidad={localidad}
+              initialBarrio={barrio}
+            />
+          </div>
+
           {/* Experiencia Laboral */}
             <div>
             <h3 className="text-xl font-semibold text-[#5e17eb] mb-4">Experiencia Laboral</h3>

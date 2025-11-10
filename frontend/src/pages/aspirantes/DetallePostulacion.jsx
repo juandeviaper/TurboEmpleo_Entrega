@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Navbar from '../../components/navbar';
+import AspiranteNavbar from '../../components/AspiranteNavbar';
 import Footer from '../../components/footer';
-import { FaBuilding, FaArrowLeft } from 'react-icons/fa';
+import Breadcrumbs from '../../components/Breadcrumbs';
+import { FaBuilding, FaArrowLeft, FaMapMarkerAlt, FaDollarSign, FaClock, FaCheckCircle } from 'react-icons/fa';
 
 function DetallePostulacion() {
     const { id } = useParams();
@@ -36,8 +37,15 @@ function DetallePostulacion() {
 
     return (
         <>
-            <Navbar />
+            <AspiranteNavbar />
             <div className="min-h-screen bg-[#f6f4fa] flex flex-col items-center py-10 pt-24">
+                <div className="w-full max-w-3xl px-4 mb-6">
+                    <Breadcrumbs items={[
+                        { label: 'Inicio', path: '/aspirantes/vacantes' },
+                        { label: 'Mis Postulaciones', path: '/aspirantes/postulaciones' },
+                        { label: postulacion?.pos_vacante_fk?.va_titulo || 'Detalle de Postulación', active: true }
+                    ]} />
+                </div>
                 <div className="bg-white rounded-xl shadow p-8 w-full max-w-3xl flex flex-col gap-4 border-t-4 border-[#A67AFF]">
                     <div className="flex items-center gap-4 mb-2">
                         {empresa && empresa.em_logo ? (

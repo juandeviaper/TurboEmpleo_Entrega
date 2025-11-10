@@ -63,8 +63,14 @@ function Login() {
             }
           }
 
-          // Forzar recarga para que Navbar detecte sesión
-                    window.location.href = "/dashboard";
+          // Forzar recarga y redirigir según tipo de usuario
+          if (data.user && (data.user.asp_nombre || data.user.asp_email || data.user.asp_cedula)) {
+            window.location.href = "/aspirantes/vacantes"; // Redirigir a aspirantes
+          } else if (data.user && (data.user.em_nombre || data.user.em_email || data.user.em_nit)) {
+            window.location.href = "/empresas/dashboard"; // Redirigir a empresas
+          } else {
+            window.location.href = "/aspirantes/vacantes"; // Por defecto ir a aspirantes
+          }
         } else {
           setError("No se recibió token de autenticación");
         }
@@ -86,7 +92,14 @@ function Login() {
             const token = emailData.token || emailData.access;
             if (token) {
               localStorage.setItem("token", token);
-              window.location.href = "/dashboard";
+              // Redirigir según tipo de usuario
+              if (emailData.user && (emailData.user.asp_nombre || emailData.user.asp_email || emailData.user.asp_cedula)) {
+                window.location.href = "/aspirantes/vacantes";
+              } else if (emailData.user && (emailData.user.em_nombre || emailData.user.em_email || emailData.user.em_nit)) {
+                window.location.href = "/empresas/dashboard";
+              } else {
+                window.location.href = "/aspirantes/vacantes";
+              }
               return;
             }
           }
@@ -110,15 +123,23 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f6f3ff] to-[#e9e4fa] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Elementos decorativos de fondo */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-0 left-0 w-full h-full opacity-5">
-          <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-[#5e17eb]"></div>
-          <div className="absolute top-40 right-20 w-24 h-24 rounded-full bg-[#ffde59]"></div>
-          <div className="absolute bottom-20 left-1/4 w-28 h-28 rounded-full bg-[#A67AFF]"></div>
-          <div className="absolute bottom-40 right-1/3 w-36 h-36 rounded-full bg-[#5e17eb]"></div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-[#7c3aed]/10 via-white to-[#ffde59]/10 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Formas geométricas animadas */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Formas geométricas animadas - Superior */}
+        <div className="absolute top-[5%] left-[5%] w-[25vw] h-[25vw] max-w-[300px] max-h-[300px] min-w-[150px] min-h-[150px] bg-[#A67AFF] rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute top-[2%] right-[10%] w-[20vw] h-[20vw] max-w-[250px] max-h-[250px] min-w-[120px] min-h-[120px] bg-[#ffde59] rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-[15%] left-[30%] w-[18vw] h-[18vw] max-w-[200px] max-h-[200px] min-w-[100px] min-h-[100px] bg-[#A67AFF] rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-blob animation-delay-3000"></div>
+        
+        {/* Grupo 2 - Centro */}
+        <div className="absolute top-[40%] left-[8%] w-[22vw] h-[22vw] max-w-[280px] max-h-[280px] min-w-[140px] min-h-[140px] bg-[#ffde59] rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-[35%] right-[15%] w-[28vw] h-[28vw] max-w-[320px] max-h-[320px] min-w-[160px] min-h-[160px] bg-[#A67AFF] rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-blob animation-delay-5000"></div>
+        <div className="absolute top-[50%] right-[5%] w-[15vw] h-[15vw] max-w-[180px] max-h-[180px] min-w-[90px] min-h-[90px] bg-[#ffde59] rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-6000"></div>
+        
+        {/* Grupo 3 - Inferior */}
+        <div className="absolute bottom-[10%] left-[12%] w-[24vw] h-[24vw] max-w-[290px] max-h-[290px] min-w-[145px] min-h-[145px] bg-[#A67AFF] rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        <div className="absolute bottom-[5%] right-[8%] w-[30vw] h-[30vw] max-w-[350px] max-h-[350px] min-w-[175px] min-h-[175px] bg-[#ffde59] rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-blob animation-delay-6000"></div>
+        <div className="absolute bottom-[15%] left-[40%] w-[20vw] h-[20vw] max-w-[240px] max-h-[240px] min-w-[120px] min-h-[120px] bg-[#A67AFF] rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-7000"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-md">

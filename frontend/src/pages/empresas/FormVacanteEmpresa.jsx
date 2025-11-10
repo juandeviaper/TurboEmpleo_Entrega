@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { FaCheckCircle } from 'react-icons/fa';
+import UbicacionSelect from "../../components/UbicacionSelect";
 
 function FormVacanteEmpresa({ onSuccess, vacanteEditar, cancelarEdicion }) {
     const [form, setForm] = useState({
@@ -13,8 +14,13 @@ function FormVacanteEmpresa({ onSuccess, vacanteEditar, cancelarEdicion }) {
         va_responsabilidades: "",
         va_beneficios: "",
         va_habilidades: "",
+        va_categoria: "",
         va_estado: "Activa"
     });
+    const [localidad, setLocalidad] = useState("");
+    const [barrio, setBarrio] = useState("");
+    const [localidadNombre, setLocalidadNombre] = useState("");
+    const [barrioNombre, setBarrioNombre] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const token = localStorage.getItem("token");
@@ -23,6 +29,11 @@ function FormVacanteEmpresa({ onSuccess, vacanteEditar, cancelarEdicion }) {
 
     useEffect(() => {
         if (vacanteEditar) {
+            // Extraer localidad y barrio de la ubicación si existe
+            const ubicacionParts = vacanteEditar.va_ubicacion ? vacanteEditar.va_ubicacion.split(", ") : ["", ""];
+            setLocalidadNombre(ubicacionParts[0] || "");
+            setBarrioNombre(ubicacionParts[1] || "");
+            
             setForm({
                 va_titulo: vacanteEditar.va_titulo || "",
                 va_requisitos: vacanteEditar.va_requisitos || "",
@@ -54,6 +65,20 @@ function FormVacanteEmpresa({ onSuccess, vacanteEditar, cancelarEdicion }) {
     const handleChange = e => {
         const { name, value } = e.target;
         setForm(f => ({ ...f, [name]: value }));
+    };
+
+    const handleLocalidadChange = (localidadId, nombre) => {
+        setLocalidad(localidadId);
+        setLocalidadNombre(nombre);
+        setBarrio("");
+        setBarrioNombre("");
+        setForm(f => ({ ...f, va_ubicacion: `${nombre}` }));
+    };
+
+    const handleBarrioChange = (barrioId, nombre) => {
+        setBarrio(barrioId);
+        setBarrioNombre(nombre);
+        setForm(f => ({ ...f, va_ubicacion: `${localidadNombre}, ${nombre}` }));
     };
 
     const handleSubmit = async e => {
@@ -149,13 +174,12 @@ function FormVacanteEmpresa({ onSuccess, vacanteEditar, cancelarEdicion }) {
                 </div>
                 <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Ubicación *</label>
-                    <input 
-                        name="va_ubicacion" 
-                        value={form.va_ubicacion} 
-                        onChange={handleChange} 
-                        required 
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A67AFF]" 
-                        placeholder="Ej: Bogotá, Colombia"
+                    <UbicacionSelect
+                        onLocalidadChange={handleLocalidadChange}
+                        onBarrioChange={handleBarrioChange}
+                        initialLocalidad={localidad}
+                        initialBarrio={barrio}
+                        className="mb-0"
                     />
                 </div>
                 <div>
@@ -174,6 +198,34 @@ function FormVacanteEmpresa({ onSuccess, vacanteEditar, cancelarEdicion }) {
                         <option value="Freelance">Freelance</option>
                         <option value="Contrato">Contrato</option>
                         <option value="Pasantía">Pasantía</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Categoría *</label>
+                    <select 
+                        name="va_categoria" 
+                        value={form.va_categoria} 
+                        onChange={handleChange} 
+                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A67AFF]"
+                        required
+                    >
+                        <option value="">Seleccionar categoría</option>
+                        <option value="Tecnología">Tecnología (+1,200 empleos)</option>
+                        <option value="Marketing">Marketing (+850 empleos)</option>
+                        <option value="Finanzas">Finanzas (+920 empleos)</option>
+                        <option value="Ventas">Ventas (+1,050 empleos)</option>
+                        <option value="Administración">Administración (+760 empleos)</option>
+                        <option value="Salud">Salud (+680 empleos)</option>
+                        <option value="Educación">Educación (+520 empleos)</option>
+                        <option value="Recursos Humanos">Recursos Humanos</option>
+                        <option value="Diseño">Diseño</option>
+                        <option value="Logística">Logística</option>
+                        <option value="Servicio al Cliente">Servicio al Cliente</option>
+                        <option value="Legal">Legal</option>
+                        <option value="Construcción">Construcción</option>
+                        <option value="Gastronomía">Gastronomía</option>
+                        <option value="Manufactura">Manufactura</option>
+                        <option value="Otros">Otros</option>
                     </select>
                 </div>
             </div>

@@ -40,7 +40,11 @@ from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UsuarioSerializer, AspiranteSerializer, EmpresaSerializer, VacanteSerializer, UsuarioRegistroSerializer, ExperienciaLaboralSerializer, ExperienciaEscolarSerializer
+from .serializers import (
+    UsuarioSerializer, AspiranteSerializer, EmpresaSerializer, 
+    VacanteSerializer, RegistroSerializer, ExperienciaLaboralSerializer, 
+    ExperienciaEscolarSerializer
+)
 # ViewSet para ExperienciaLaboral
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -126,14 +130,68 @@ class DetalleVacanteViewSet(viewsets.ModelViewSet):
 
 class UsuarioRegistroView(APIView):
     def post(self, request):
-        serializer = UsuarioRegistroSerializer(data=request.data)
-        if serializer.is_valid():
-            usuario = serializer.save()
+        try:
+            print("Datos recibidos:", request.data)
+            print("Archivos recibidos:", request.FILES)
+            
+            # Validar campos requeridos
+            required_fields = ['user_nombre', 'user_contraseña', 'user_rol']
+            missing_fields = [field for field in required_fields if field not in request.data]
+            if missing_fields:
+                return Response(
+                    {"error": f"Faltan campos requeridos: {', '.join(missing_fields)}"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Crear un diccionario con los datos sin los archivos
+            data = {}
+            for key in request.data.keys():
+                # Excluir los campos de archivo
+                if key not in ['em_curriculum', 'em_logo', 'asp_curriculum', 'asp_foto']:
+                    data[key] = request.data[key]
+            
+            # Normalizar el rol
+            user_rol = request.data.get('user_rol', '').lower()
+            data['user_rol'] = user_rol
+
+            # Agregar archivos al diccionario de datos si existen
+            if 'em_curriculum' in request.FILES:
+                data['em_curriculum'] = request.FILES['em_curriculum']
+            if 'em_logo' in request.FILES:
+                data['em_logo'] = request.FILES['em_logo']
+            if 'asp_curriculum' in request.FILES:
+                data['asp_curriculum'] = request.FILES['asp_curriculum']
+            if 'asp_foto' in request.FILES:
+                data['asp_foto'] = request.FILES['asp_foto']
+
+            # Verificar que el nombre de usuario no sea un correo electrónico
+            if '@' in data.get('user_nombre', ''):
+                return Response(
+                    {"error": "El nombre de usuario no puede ser un correo electrónico. Por favor, use un nombre de usuario diferente."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Validar y crear usuario/perfil base
+            serializer = RegistroSerializer(data=data)
+            if not serializer.is_valid():
+                print("Errores de validación:", serializer.errors)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            # Crear usuario y perfil base
+            perfil = serializer.save()
             return Response(
                 {"message": "Usuario registrado exitosamente"},
                 status=status.HTTP_201_CREATED
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            import traceback
+            print("Error no manejado en UsuarioRegistroView:")
+            print(traceback.format_exc())
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
@@ -216,8 +274,7 @@ Asunto: {asunto}
 
 Mensaje:
 {mensaje}
-"""
-        
+"""        
         # En desarrollo, imprimir en consola
         print('='*60)
         print('NUEVO MENSAJE DE CONTACTO')

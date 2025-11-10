@@ -1,8 +1,9 @@
 
 import React, { useEffect, useState, useRef } from "react";
-import Navbar from "../../components/navbar";
+import AspiranteNavbar from "../../components/AspiranteNavbar";
 import Footer from "../../components/footer";
 import Breadcrumbs from "../../components/Breadcrumbs";
+import UbicacionSelect from "../../components/UbicacionSelect";
 
 function PerfilAspirante() {
     const [form, setForm] = useState(null);
@@ -14,7 +15,7 @@ function PerfilAspirante() {
     const [sidebarSection, setSidebarSection] = useState("datos"); // 'datos' o 'config'
 
     const breadcrumbItems = [
-        { label: 'Dashboard', path: '/aspirantes/dashboard' },
+        { label: 'Inicio', path: '/aspirantes/vacantes' },
         { label: 'Mi Perfil', active: true }
     ];
 
@@ -56,6 +57,14 @@ function PerfilAspirante() {
         setLoading(false);
         });
     }, [token, aspiranteId]);
+
+    const handleLocalidadChange = (localidadId, nombre) => {
+        setForm(f => ({ ...f, asp_localidad: nombre }));
+    };
+
+    const handleBarrioChange = (barrioId, nombre) => {
+        setForm(f => ({ ...f, asp_barrio: nombre }));
+    };
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -179,7 +188,7 @@ function PerfilAspirante() {
 
     return (
         <div className="min-h-screen flex flex-col bg-[#f6f4fa]">
-            <Navbar />
+            <AspiranteNavbar />
             <main className="flex-1 flex flex-col items-center pt-24 pb-10 px-4">
                 <div className="w-full max-w-7xl mb-6">
                     <Breadcrumbs items={breadcrumbItems} />
@@ -279,12 +288,13 @@ function PerfilAspirante() {
                                             <input name="asp_telefono" value={form.asp_telefono || ""} onChange={handleChange} type="tel" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5e17eb]" required />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-1">Departamento</label>
-                                            <input name="asp_departamento" value={form.asp_departamento || ""} onChange={handleChange} type="text" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5e17eb]" required />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-1">Ciudad</label>
-                                            <input name="asp_ciudad" value={form.asp_ciudad || ""} onChange={handleChange} type="text" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5e17eb]" required />
+                                            <label className="block text-sm font-semibold text-gray-700 mb-1">Ubicación</label>
+                                            <UbicacionSelect
+                                                onLocalidadChange={handleLocalidadChange}
+                                                onBarrioChange={handleBarrioChange}
+                                                initialLocalidad={form.asp_localidad}
+                                                initialBarrio={form.asp_barrio}
+                                            />
                                         </div>
                                     </div>
                                     <div className="flex flex-col gap-4">

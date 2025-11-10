@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
 import Breadcrumbs from "../../components/Breadcrumbs";
+import UbicacionSelect from "../../components/UbicacionSelect";
 
 
 function PerfilEmpresa() {
@@ -58,6 +59,14 @@ function PerfilEmpresa() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm((f) => ({ ...f, [name]: value }));
+    };
+
+    const handleLocalidadChange = (localidadId, nombre) => {
+        setForm(f => ({ ...f, em_localidad: nombre }));
+    };
+
+    const handleBarrioChange = (barrioId, nombre) => {
+        setForm(f => ({ ...f, em_barrio: nombre }));
     };
 
     const handleSubmit = async (e) => {
@@ -177,12 +186,13 @@ function PerfilEmpresa() {
                                             <input name="em_telefono" value={form.em_telefono || ""} onChange={handleChange} type="text" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A67AFF]" />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-1">Departamento</label>
-                                            <input name="em_departamento" value={form.em_departamento || ""} onChange={handleChange} type="text" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A67AFF]" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-1">Ciudad</label>
-                                            <input name="em_ciudad" value={form.em_ciudad || ""} onChange={handleChange} type="text" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A67AFF]" />
+                                            <label className="block text-sm font-semibold text-gray-700 mb-1">Ubicación</label>
+                                            <UbicacionSelect
+                                                onLocalidadChange={handleLocalidadChange}
+                                                onBarrioChange={handleBarrioChange}
+                                                initialLocalidad={form.em_localidad}
+                                                initialBarrio={form.em_barrio}
+                                            />
                                         </div>
                                     </div>
                                     <div className="flex flex-col gap-4">

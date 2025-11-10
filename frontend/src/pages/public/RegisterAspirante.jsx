@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import React, { useRef, useState } from "react";
+import UbicacionSelect from "../../components/UbicacionSelect";
 
-function RegisterAspirante() {
+function RegisterAspirante({ embedded = false, onSuccess }) {
   const fileInputRef = useRef();
   const fotoInputRef = useRef();
   const [fotoPreview, setFotoPreview] = useState(null);
@@ -12,8 +13,10 @@ function RegisterAspirante() {
     password: "",
     email: "",
     telefono: "",
-    departamento: "",
-    ciudad: "",
+    localidad: "",
+    barrio: "",
+    localidadNombre: "",
+    barrioNombre: "",
     ocupacion: "",
     nacimiento_dia: "",
     nacimiento_mes: "",
@@ -29,6 +32,24 @@ function RegisterAspirante() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [aceptaDatos, setAceptaDatos] = useState(false);
+
+  const handleLocalidadChange = (localidadId, nombre) => {
+    setForm(f => ({
+      ...f,
+      localidad: localidadId,
+      localidadNombre: nombre,
+      barrio: "",
+      barrioNombre: ""
+    }));
+  };
+
+  const handleBarrioChange = (barrioId, nombre) => {
+    setForm(f => ({
+      ...f,
+      barrio: barrioId,
+      barrioNombre: nombre
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -97,8 +118,8 @@ function RegisterAspirante() {
     formData.append('asp_apellido', form.apellido);
     formData.append('asp_correo', form.email);
     formData.append('asp_telefono', form.telefono);
-    formData.append('asp_departamento', form.departamento);
-    formData.append('asp_ciudad', form.ciudad);
+    formData.append('asp_localidad', form.localidadNombre);
+    formData.append('asp_barrio', form.barrioNombre);
     formData.append('asp_ocupacion', form.ocupacion);
     formData.append('asp_nacimiento_dia', form.nacimiento_dia);
     formData.append('asp_nacimiento_mes', form.nacimiento_mes);
@@ -134,8 +155,10 @@ function RegisterAspirante() {
           password: "",
           email: "",
           telefono: "",
-          departamento: "",
-          ciudad: "",
+          localidad: "",
+          barrio: "",
+          localidadNombre: "",
+          barrioNombre: "",
           ocupacion: "",
           nacimiento_dia: "",
           nacimiento_mes: "",
@@ -148,6 +171,8 @@ function RegisterAspirante() {
           descripcion: "",
           curriculum: null,
         });
+        // notify parent that registration succeeded (used to move to verification step)
+        if (onSuccess) onSuccess();
       } else {
         setError(data.message || data.detail || 'Error al registrar aspirante');
       }
@@ -157,16 +182,18 @@ function RegisterAspirante() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f6f3ff] to-[#e9e4fa] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className={embedded ? "relative z-10 w-full" : "min-h-screen bg-gradient-to-br from-[#f6f3ff] to-[#e9e4fa] flex flex-col items-center justify-center p-4 relative overflow-hidden"}>
       {/* Elementos decorativos de fondo */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-0 left-0 w-full h-full opacity-5">
-          <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-[#5e17eb]"></div>
-          <div className="absolute top-40 right-20 w-24 h-24 rounded-full bg-[#ffde59]"></div>
-          <div className="absolute bottom-20 left-1/4 w-28 h-28 rounded-full bg-[#A67AFF]"></div>
-          <div className="absolute bottom-40 right-1/3 w-36 h-36 rounded-full bg-[#5e17eb]"></div>
+      {!embedded && (
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-0 left-0 w-full h-full opacity-5">
+            <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-[#5e17eb]"></div>
+            <div className="absolute top-40 right-20 w-24 h-24 rounded-full bg-[#ffde59]"></div>
+            <div className="absolute bottom-20 left-1/4 w-28 h-28 rounded-full bg-[#A67AFF]"></div>
+            <div className="absolute bottom-40 right-1/3 w-36 h-36 rounded-full bg-[#5e17eb]"></div>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="relative z-10 w-full max-w-4xl">
         <div className="text-center mb-8">
@@ -359,43 +386,13 @@ function RegisterAspirante() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                    <input 
-                      name="departamento" 
-                      value={form.departamento} 
-                      onChange={handleChange} 
-                      type="text" 
-                      className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5e17eb] focus:border-transparent transition" 
-                      required 
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                    <input 
-                      name="ciudad" 
-                      value={form.ciudad} 
-                      onChange={handleChange} 
-                      type="text" 
-                      className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5e17eb] focus:border-transparent transition" 
-                      required 
-                    />
-                  </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación</label>
+                  <UbicacionSelect
+                    onLocalidadChange={handleLocalidadChange}
+                    onBarrioChange={handleBarrioChange}
+                    initialLocalidad={form.localidad}
+                    initialBarrio={form.barrio}
+                  />
                 </div>
               </div>
             </div>

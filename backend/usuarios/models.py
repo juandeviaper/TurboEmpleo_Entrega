@@ -16,6 +16,8 @@ class Aspirante(models.Model):
     asp_telefono = models.CharField(max_length=20, blank=True, null=True)
     asp_departamento = models.CharField(max_length=100, blank=True, null=True)
     asp_ciudad = models.CharField(max_length=100, blank=True, null=True)
+    asp_localidad = models.CharField(max_length=100, blank=True, null=True)
+    asp_barrio = models.CharField(max_length=100, blank=True, null=True)
     asp_ocupacion = models.CharField(max_length=100, blank=True, null=True)
     asp_nacimiento_dia = models.IntegerField(blank=True, null=True)
     asp_nacimiento_mes = models.IntegerField(blank=True, null=True)
@@ -40,8 +42,8 @@ class Empresa(models.Model):
     em_nit = models.CharField(max_length=50, blank=True, null=True)
     em_email = models.EmailField(blank=True, null=True)
     em_telefono = models.CharField(max_length=20, blank=True, null=True)
-    em_departamento = models.CharField(max_length=100, blank=True, null=True)
-    em_ciudad = models.CharField(max_length=100, blank=True, null=True)
+    em_localidad = models.CharField(max_length=100, blank=True, null=True)
+    em_barrio = models.CharField(max_length=100, blank=True, null=True)
     em_sector = models.CharField(max_length=100, blank=True, null=True)
     em_contacto = models.CharField(max_length=100, blank=True, null=True)
     em_password = models.CharField(max_length=128, blank=True, null=True)
@@ -116,6 +118,25 @@ class Usuarios(AbstractBaseUser, PermissionsMixin):
 # ... (código anterior)
 
 class Vacante(models.Model):
+    CATEGORIAS = [
+        ('Tecnología', 'Tecnología'),
+        ('Marketing', 'Marketing'),
+        ('Finanzas', 'Finanzas'),
+        ('Ventas', 'Ventas'),
+        ('Administración', 'Administración'),
+        ('Salud', 'Salud'),
+        ('Educación', 'Educación'),
+        ('Recursos Humanos', 'Recursos Humanos'),
+        ('Diseño', 'Diseño'),
+        ('Logística', 'Logística'),
+        ('Servicio al Cliente', 'Servicio al Cliente'),
+        ('Legal', 'Legal'),
+        ('Construcción', 'Construcción'),
+        ('Gastronomía', 'Gastronomía'),
+        ('Manufactura', 'Manufactura'),
+        ('Otros', 'Otros')
+    ]
+
     va_titulo = models.CharField(max_length=200)
     va_requisitos = models.TextField()
     va_salario = models.DecimalField(max_digits=10, decimal_places=2)
@@ -125,6 +146,7 @@ class Vacante(models.Model):
     va_responsabilidades = models.TextField(blank=True, null=True)
     va_beneficios = models.TextField(blank=True, null=True)
     va_habilidades = models.TextField(blank=True, null=True)
+    va_categoria = models.CharField(max_length=50, choices=CATEGORIAS, default='Otros')
     va_estado = models.CharField(max_length=20)
     va_idEmpresa_fk = models.ForeignKey(Empresa, on_delete=models.CASCADE)
     va_fecha_publicacion = models.DateTimeField(auto_now_add=True)

@@ -1,7 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import Toast from './Toast';
 import { FaBars, FaTimes, FaUserCircle, FaSearch, FaBriefcase, FaBuilding, FaBlog, FaEnvelope } from 'react-icons/fa';
-import logo from '../assets/img/Logo/claro/logotipo.png';
+import Logo from './Logo';
 import NotificationBell from './NotificationBell';
 
 function Navbar() {
@@ -33,8 +34,14 @@ function Navbar() {
     localStorage.removeItem("user_data");
     setIsAuth(false);
     setUser(null);
-    navigate("/login");
+    // Mostrar notificación personalizada
+    setShowLogoutToast(true);
+    setTimeout(() => {
+      navigate('/');
+    }, 1400);
   };
+
+  const [showLogoutToast, setShowLogoutToast] = useState(false);
 
   // Enlaces principales para todos los usuarios
   const mainLinks = (
@@ -163,9 +170,7 @@ function Navbar() {
     <nav className="fixed top-0 left-0 w-full bg-white shadow-sm py-3 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
-          <Link to="/" className="flex items-center">
-            <img src={logo} alt="TurboEmpleo Logo" className="w-72 h-auto" />
-          </Link>
+          <Logo userData={user} />
 
           {/* Menú para pantallas grandes */}
           <div className="hidden md:flex items-center space-x-8">
@@ -266,6 +271,15 @@ function Navbar() {
           </div>
         )}
       </div>
+      {/* Toast de cierre de sesión */}
+      <Toast 
+        message="¡Hasta pronto! Has cerrado sesión correctamente" 
+        show={showLogoutToast} 
+        onClose={() => setShowLogoutToast(false)}
+        type="info"
+        duration={1400}
+        position="top-right"
+      />
     </nav>
   );
 }

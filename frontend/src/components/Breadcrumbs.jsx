@@ -18,9 +18,9 @@ function Breadcrumbs({ items = [] }) {
 
     return (
         <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6 bg-white px-4 py-3 rounded-lg shadow-sm">
-            {/* Icono de inicio */}
+            {/* Icono de inicio - Ahora usa el path del primer item */}
             <Link 
-                to="/" 
+                to={items[0]?.path || '/'} 
                 className="flex items-center hover:text-[#5e17eb] transition-colors"
                 title="Ir al inicio"
             >
