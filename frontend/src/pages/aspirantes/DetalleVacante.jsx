@@ -29,56 +29,82 @@ function DetalleVacante() {
             });
     }, [id, token]);
 
+    const [postulando, setPostulando] = useState(false);
+    const [errorPostulacion, setErrorPostulacion] = useState("");
+
     const handlePostular = async () => {
-        if (!token || !userData) {
-            alert("Debes iniciar sesión como aspirante para postularte.");
-            return;
-        }
-        
-        // Validar que el aspirante tenga CV cargado
-        if (!userData.asp_curriculum) {
-            const confirmar = window.confirm(
-                "No has cargado tu hoja de vida. ¿Deseas ir a tu perfil para cargarla?"
-            );
-            if (confirmar) {
-                navigate("/aspirantes/perfil");
-            }
-            return;
-        }
-        
         try {
+            setPostulando(true);
+            setErrorPostulacion("");
+
+            if (!token || !userData) {
+                navigate('/login', { state: { from: `/aspirantes/vacantes/${id}` } });
+                return;
+            }
+            
+            if (!userData.asp_curriculum) {
+                const confirmar = window.confirm(
+                    "Necesitas tener tu hoja de vida cargada para postularte. ¿Deseas ir a tu perfil para cargarla?"
+                );
+                if (confirmar) {
+                    navigate("/aspirantes/perfil");
+                }
+                return;
+            }
+
+            const postulacionData = {
+                pos_estado: "pendiente",
+                pos_aspirante_fk: userData.id,
+                pos_vacante_fk: vacante.id
+            };
+
+            console.log("Enviando postulación:", postulacionData);
+
             const res = await fetch(`http://127.0.0.1:8000/api/postulaciones/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({
-                    pos_estado: "Pendiente",
-                    pos_aspirante_fk: userData.id,
-                    pos_vacante_fk: vacante.id,
-                }),
+                body: JSON.stringify(postulacionData)
             });
+
+            // Primero verificar el tipo de contenido
+            const contentType = res.headers.get("content-type");
+            if (contentType && !contentType.includes("application/json")) {
+                if (res.status === 500) {
+                    throw new Error("Error interno del servidor. Por favor, intenta más tarde.");
+                }
+                const text = await res.text();
+                console.error("Respuesta no JSON del servidor:", text);
+                throw new Error("El servidor respondió en un formato inesperado");
+            }
+
             const data = await res.json();
+            console.log("Respuesta del servidor:", data);
+
             if (res.ok) {
                 alert("¡Postulación exitosa! Tu solicitud ha sido enviada al empleador.");
-                
-                // Actualizar user_data en localStorage con la nueva postulación
-                const updatedUserData = { ...userData };
-                localStorage.setItem("user_data", JSON.stringify(updatedUserData));
-                
                 navigate("/aspirantes/postulaciones");
             } else {
-                if (res.status === 400 && data.detail && data.detail.includes("ya postulado")) {
-                    alert("Ya te has postulado a esta vacante anteriormente.");
-                } else {
-                    alert(data.detail || JSON.stringify(data) || "No se pudo postular. Intenta nuevamente.");
+                let mensaje = "No se pudo realizar la postulación";
+                if (data.detail) {
+                    mensaje = data.detail;
+                } else if (data.pos_estado) {
+                    mensaje = data.pos_estado;
+                } else if (typeof data === 'object' && Object.keys(data).length > 0) {
+                    mensaje = Object.entries(data)
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join(', ');
                 }
-                console.error("Error postulación:", data);
+                setErrorPostulacion(mensaje);
+                console.error("Error de postulación:", data);
             }
-        } catch (e) {
-            alert("Error de conexión al postularse.");
-            console.error("Error de red:", e);
+        } catch (error) {
+            console.error("Error al postular:", error);
+            setErrorPostulacion(error.message || "Error al procesar la solicitud. Por favor, intenta nuevamente.");
+        } finally {
+            setPostulando(false);
         }
     };
 
@@ -159,6 +185,12 @@ function DetalleVacante() {
                             ))}
                         </div>
                     )}
+                    {errorPostulacion && (
+                        <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm">
+                            {errorPostulacion}
+                        </div>
+                    )}
+
                     <div className="flex gap-4 mt-4">
                         <button
                             className="flex-1 px-6 py-2 bg-transparent border-2 border-gray-400 text-gray-700 rounded hover:bg-gray-100 transition text-lg font-semibold flex items-center justify-center gap-2"
@@ -169,8 +201,9 @@ function DetalleVacante() {
                         <button
                             className="flex-1 px-6 py-2 bg-[#A67AFF] text-white rounded hover:bg-[#5e17eb] transition text-lg font-semibold flex items-center justify-center gap-2"
                             onClick={handlePostular}
+                            disabled={postulando}
                         >
-                            <FaCheckCircle /> Postularme
+                            <FaCheckCircle /> {postulando ? 'Postulando...' : 'Postularme'}
                         </button>
                     </div>
                 </div>

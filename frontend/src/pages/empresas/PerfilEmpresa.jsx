@@ -62,11 +62,20 @@ function PerfilEmpresa() {
     };
 
     const handleLocalidadChange = (localidadId, nombre) => {
-        setForm(f => ({ ...f, em_localidad: nombre }));
+        console.log('Localidad seleccionada:', { id: localidadId, nombre });
+        setForm(f => ({
+            ...f,
+            em_localidad: nombre,
+            em_barrio: '' // Resetear el barrio cuando cambia la localidad
+        }));
     };
 
     const handleBarrioChange = (barrioId, nombre) => {
-        setForm(f => ({ ...f, em_barrio: nombre }));
+        console.log('Barrio seleccionado:', { id: barrioId, nombre });
+        setForm(f => ({
+            ...f,
+            em_barrio: nombre || '' // Asegurarnos de que nunca sea null
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -147,7 +156,9 @@ function PerfilEmpresa() {
                                     ) : form.em_logo ? (
                                         <img src={form.em_logo} alt="Logo actual" className="w-40 h-40 object-cover rounded-full border-4 border-[#5e17eb] shadow-lg mb-2" />
                                     ) : (
-                                        <span className="text-gray-400 text-lg mb-2">Sin logo</span>
+                                        <div className="w-40 h-40 rounded-full border-4 border-[#5e17eb] shadow-lg mb-2 flex items-center justify-center bg-gray-50">
+                                            <span className="text-4xl font-bold text-[#5e17eb]/40">{form.em_nombre ? form.em_nombre.charAt(0).toUpperCase() : 'E'}</span>
+                                        </div>
                                     )}
                                     <label className="block">
                                         <button
@@ -232,30 +243,8 @@ function PerfilEmpresa() {
                                         Cancelar
                                     </button>
                                     <button 
-                                        type="button" 
-                                        onClick={() => {
-                                            // Recargar los datos originales
-                                            if (!token || !empresaId) return;
-                                            fetch(`http://127.0.0.1:8000/api/empresas/${empresaId}/`, {
-                                                headers: { Authorization: `Bearer ${token}` },
-                                            })
-                                                .then((res) => res.json())
-                                                .then((data) => {
-                                                    setForm(data);
-                                                    setLogoFile(null);
-                                                    setLogoPreview(null);
-                                                    if (logoInputRef.current) logoInputRef.current.value = "";
-                                                    setSuccess("Datos restablecidos");
-                                                })
-                                                .catch(() => setError("Error al restablecer los datos"));
-                                        }}
-                                        className="flex-1 bg-transparent border-2 border-gray-400 text-gray-600 font-bold py-3 rounded-lg shadow hover:bg-gray-400 hover:text-white transition text-lg"
-                                    >
-                                        Limpiar datos
-                                    </button>
-                                    <button 
                                         type="submit" 
-                                        className="flex-1 bg-[#A67AFF] text-white font-bold py-3 rounded-lg shadow hover:bg-[#5e17eb] transition text-lg"
+                                        className="flex-2 bg-[#A67AFF] text-white font-bold py-3 rounded-lg shadow hover:bg-[#5e17eb] transition text-lg md:w-2/3"
                                     >
                                         Guardar cambios
                                     </button>

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import AspiranteNavbar from '../../components/AspiranteNavbar';
 import Footer from '../../components/footer';
 import Breadcrumbs from '../../components/Breadcrumbs';
-import { FaBuilding, FaArrowLeft, FaMapMarkerAlt, FaDollarSign, FaClock, FaCheckCircle } from 'react-icons/fa';
+import { FaBuilding, FaArrowLeft, FaMapMarkerAlt, FaDollarSign, FaClock } from 'react-icons/fa';
 
 function DetallePostulacion() {
     const { id } = useParams();
@@ -90,7 +90,9 @@ function DetallePostulacion() {
                             </ul>
                         </div>
                     )}
-                    <div className="text-gray-700 text-md font-semibold">Estado de la postulación: <span className="text-[#5e17eb]">{postulacion.pos_estado}</span></div>
+                    <div className="text-gray-700 text-md font-semibold flex items-center gap-4">
+                        <span>Estado de la postulación: <span className="text-[#5e17eb]">{postulacion.pos_estado}</span></span>
+                    </div>
                     
                     <button
                         className="mt-4 px-6 py-2 bg-transparent border-2 border-gray-400 text-gray-700 rounded hover:bg-gray-100 transition text-lg font-semibold flex items-center justify-center gap-2"

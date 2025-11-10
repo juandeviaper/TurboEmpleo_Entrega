@@ -4,6 +4,10 @@ from .serializers import PostulacionSerializer, NotificacionSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.utils import timezone
+
 class PostulacionViewSet(viewsets.ModelViewSet):
     queryset = Postulacion.objects.all()
 
@@ -35,6 +39,19 @@ class PostulacionViewSet(viewsets.ModelViewSet):
         queryset = queryset.order_by('-pos_fechaPostulacion')
         
         return queryset
+
+    def perform_update(self, serializer):
+        """Sobrescribir para manejar cambios de estado"""
+        old_estado = self.get_object().pos_estado
+        postulacion = serializer.save()
+        
+        # Si el estado cambió y está en modo turbo, notificar
+        if old_estado != postulacion.pos_estado and postulacion.pos_modo_turbo:
+            Notificacion.objects.create(
+                not_usuario_fk=postulacion.pos_aspirante_fk.asp_usuario_fk,
+                not_contenido=f"Tu postulación TURBO para '{postulacion.pos_vacante_fk.va_titulo}' ha cambiado a estado: {postulacion.pos_estado}",
+                not_estado='No leída'
+            )
 from .models import ExperienciaLaboral, ExperienciaEscolar
 from rest_framework import viewsets
 from rest_framework import status
@@ -131,8 +148,18 @@ class DetalleVacanteViewSet(viewsets.ModelViewSet):
 class UsuarioRegistroView(APIView):
     def post(self, request):
         try:
+            print("\n=== INICIO REGISTRO DE EMPRESA ===")
             print("Datos recibidos:", request.data)
             print("Archivos recibidos:", request.FILES)
+            if 'em_logo' in request.FILES:
+                logo = request.FILES['em_logo']
+                print("\nDetalles del logo:")
+                print(f"- Nombre del archivo: {logo.name}")
+                print(f"- Tamaño: {logo.size} bytes")
+                print(f"- Tipo de contenido: {logo.content_type}")
+                print(f"- Charset: {getattr(logo, 'charset', 'no especificado')}")
+            else:
+                print("\nNo se recibió archivo de logo")
             
             # Validar campos requeridos
             required_fields = ['user_nombre', 'user_contraseña', 'user_rol']

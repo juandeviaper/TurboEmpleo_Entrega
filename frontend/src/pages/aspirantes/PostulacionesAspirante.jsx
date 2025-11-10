@@ -167,6 +167,7 @@ function PostulacionesAspirante() {
                                                                 <span className="text-gray-500 text-sm">
                                                                     Postulado: {post.pos_fechaPostulacion ? new Date(post.pos_fechaPostulacion).toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}
                                                                 </span>
+
                                                             </div>
                                                             
                                                             {/* Detalles de la vacante */}

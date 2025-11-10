@@ -90,30 +90,33 @@ function VacantesDisponibles() {
     };
 
     const handlePostular = async (vacanteId) => {
-    if (!token || !userData) {
-        alert("Debes iniciar sesión como aspirante para postularte.");
-        return;
-    }
-    try {
-        const res = await fetch(`http://127.0.0.1:8000/api/postulaciones/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-            vacante: vacanteId,
-            aspirante: userData.id,
-        }),
-        });
-        if (res.ok) {
-        alert("¡Postulación exitosa!");
-        } else {
-        alert("No se pudo postular. Intenta nuevamente.");
+        if (!token || !userData) {
+            alert("Debes iniciar sesión como aspirante para postularte.");
+            return;
         }
-    } catch {
-        alert("Error de conexión al postularse.");
-    }
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/postulaciones/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    vacante: vacanteId,
+                    aspirante: userData.id,
+                    pos_estado: "pendiente"
+                }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert("¡Postulación exitosa!");
+            } else {
+                alert(Object.values(data).join("\n") || "No se pudo postular. Intenta nuevamente.");
+            }
+        } catch (error) {
+            console.error("Error al postular:", error);
+            alert("Error de conexión al postularse.");
+        }
     };
 
     return (
@@ -202,47 +205,32 @@ function VacantesDisponibles() {
                             const fecha = vac.va_fecha_publicacion ? new Date(vac.va_fecha_publicacion) : null;
                             const fechaStr = fecha ? fecha.toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
                             return (
-                                <div key={vac.id} className="bg-white rounded-xl shadow-md overflow-hidden transform transition-transform hover:-translate-y-1">
+                                <div key={vac.id} className="bg-white rounded-xl shadow-md overflow-hidden">
                                     <div className="p-6">
                                         <div className="flex items-center mb-4">
-                                            <div className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden">
+                                            <div className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-gray-50">
                                                 {empresa && empresa.em_logo ? (
                                                     <img 
-                                                        src={`http://127.0.0.1:8000/media/logos_empresas/${empresa.em_logo}`}
+                                                        src={empresa.em_logo}
                                                         alt={`Logo de ${empresa.em_nombre || 'empresa'}`} 
                                                         className="w-full h-full object-contain rounded-lg"
                                                         onError={(e) => {
-                                                            console.log("Error al cargar logo:", e.target.src);
                                                             e.target.onerror = null;
                                                             e.target.style.display = 'none';
-                                                            // Crear un elemento para el gradiente de fondo
-                                                            const gradient = document.createElement('div');
-                                                            gradient.className = 'absolute inset-0 bg-gradient-to-br from-[#5e17eb]/5 to-[#A67AFF]/5';
-                                                            e.target.parentElement.appendChild(gradient);
-                                                            
-                                                            // Crear el círculo con la inicial
-                                                            const circle = document.createElement('div');
-                                                            circle.className = 'relative w-full h-full rounded-lg bg-white/50 backdrop-blur-sm flex items-center justify-center';
-                                                            circle.innerHTML = `
-                                                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#5e17eb] to-[#A67AFF] flex items-center justify-center shadow-lg">
+                                                            e.target.parentElement.innerHTML = `
+                                                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#5e17eb] to-[#A67AFF] flex items-center justify-center">
                                                                     <span class="text-lg font-bold text-white">
                                                                         ${(empresa.em_nombre || 'E').charAt(0).toUpperCase()}
                                                                     </span>
                                                                 </div>
                                                             `;
-                                                            e.target.parentElement.appendChild(circle);
                                                         }}
                                                     />
                                                 ) : (
-                                                    <div className="relative w-full h-full">
-                                                        <div className="absolute inset-0 bg-gradient-to-br from-[#5e17eb]/5 to-[#A67AFF]/5"></div>
-                                                        <div className="relative w-full h-full rounded-lg bg-white/50 backdrop-blur-sm flex items-center justify-center">
-                                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5e17eb] to-[#A67AFF] flex items-center justify-center shadow-lg">
-                                                                <span className="text-lg font-bold text-white">
-                                                                    {(empresa && empresa.em_nombre ? empresa.em_nombre.charAt(0) : 'E').toUpperCase()}
-                                                                </span>
-                                                            </div>
-                                                        </div>
+                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5e17eb] to-[#A67AFF] flex items-center justify-center">
+                                                        <span className="text-lg font-bold text-white">
+                                                            {(empresa && empresa.em_nombre ? empresa.em_nombre.charAt(0) : 'E').toUpperCase()}
+                                                        </span>
                                                     </div>
                                                 )}
                                             </div>
@@ -285,13 +273,13 @@ function VacantesDisponibles() {
                                             <span className="text-sm text-gray-500 order-2 sm:order-1">Publicado: {fechaStr}</span>
                                             <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto order-1 sm:order-2">
                                                 <button
-                                                    className="w-full xs:w-auto px-4 py-2 bg-[#5e17eb] text-white text-sm rounded-full hover:bg-opacity-90 transition whitespace-nowrap"
+                                                    className="w-full xs:w-auto px-4 py-2 bg-[#5e17eb] text-white text-sm rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 whitespace-nowrap"
                                                     onClick={() => navigate(`/aspirantes/vacantes/${vac.id}`)}
                                                 >
                                                     Ver detalles
                                                 </button>
                                                 <button
-                                                    className="w-full xs:w-auto px-4 py-2 border border-[#5e17eb] text-[#5e17eb] text-sm rounded-full hover:bg-[#5e17eb] hover:text-white transition whitespace-nowrap"
+                                                    className="w-full xs:w-auto px-4 py-2 border border-[#5e17eb] text-[#5e17eb] text-sm rounded-lg hover:bg-[#5e17eb]/5 transition-colors duration-200 whitespace-nowrap"
                                                     onClick={() => handlePostular(vac.id)}
                                                 >
                                                     Postularme

@@ -143,8 +143,14 @@ function RegisterEmpresa({ embedded = false, onSuccess }) {
       formData.append('em_direccion', form.direccion);
       
       // Campos de archivos opcionales
-      if (form.curriculum) formData.append('em_curriculum', form.curriculum);
-      if (form.logo) formData.append('em_logo', form.logo);
+      if (form.curriculum) {
+        console.log('Agregando curriculum al FormData');
+        formData.append('em_curriculum', form.curriculum);
+      }
+      if (form.logo) {
+        console.log('Agregando logo al FormData:', form.logo.name);
+        formData.append('em_logo', form.logo);
+      }
       
       // Idiomas como JSON
       if (form.idiomas && form.idiomas.length > 0) {
@@ -584,8 +590,23 @@ function RegisterEmpresa({ embedded = false, onSuccess }) {
                 <input
                   name="logo"
                   type="file"
-                  accept="image/*"
-                  onChange={handleChange}
+                  accept="image/jpeg,image/png,image/gif"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                        setError("El logo no debe superar los 5MB");
+                        e.target.value = '';
+                        return;
+                      }
+                      console.log('Logo seleccionado:', {
+                        nombre: file.name,
+                        tipo: file.type,
+                        tamaño: file.size + ' bytes'
+                      });
+                    }
+                    handleChange(e);
+                  }}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5e17eb] focus:border-transparent transition"
                 />
                 {form.logo && (

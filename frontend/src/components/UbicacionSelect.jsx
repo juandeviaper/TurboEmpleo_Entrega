@@ -7,18 +7,43 @@ const UbicacionSelect = ({ onLocalidadChange, onBarrioChange, initialLocalidad, 
   const [barriosDisponibles, setBarriosDisponibles] = useState([]);
 
   useEffect(() => {
+    // Si hay una localidad seleccionada, cargar sus barrios
     if (selectedLocalidad) {
-      setBarriosDisponibles(barrios[selectedLocalidad] || []);
+      const localidadId = selectedLocalidad;
+      // Buscar el ID numérico si se pasó el nombre
+      if (isNaN(selectedLocalidad)) {
+        const loc = localidades.find(l => l.nombre === selectedLocalidad);
+        if (loc) {
+          setSelectedLocalidad(loc.id.toString());
+          setBarriosDisponibles(barrios[loc.id] || []);
+          return;
+        }
+      }
+      setBarriosDisponibles(barrios[localidadId] || []);
     } else {
       setBarriosDisponibles([]);
     }
   }, [selectedLocalidad]);
 
+  // Efecto para manejar los valores iniciales
   useEffect(() => {
     if (initialLocalidad) {
-      setBarriosDisponibles(barrios[initialLocalidad] || []);
+      // Si el initialLocalidad es un nombre en lugar de un ID
+      if (isNaN(initialLocalidad)) {
+        const loc = localidades.find(l => l.nombre === initialLocalidad);
+        if (loc) {
+          setSelectedLocalidad(loc.id.toString());
+          setBarriosDisponibles(barrios[loc.id] || []);
+        }
+      } else {
+        setSelectedLocalidad(initialLocalidad);
+        setBarriosDisponibles(barrios[initialLocalidad] || []);
+      }
     }
-  }, [initialLocalidad]);
+    if (initialBarrio) {
+      setSelectedBarrio(initialBarrio);
+    }
+  }, [initialLocalidad, initialBarrio]);
 
   const handleLocalidadChange = (e) => {
     const localidadId = e.target.value;

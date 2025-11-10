@@ -157,7 +157,15 @@ class Vacante(models.Model):
 
 # --- Nuevos modelos ---
 class Postulacion(models.Model):
-    pos_estado = models.CharField(max_length=50)
+    ESTADOS = [
+        ('pendiente', 'Pendiente'),
+        ('en_revision', 'En Revisión'),
+        ('entrevista', 'Entrevista Programada'),
+        ('aceptada', 'Aceptada'),
+        ('rechazada', 'Rechazada')
+    ]
+    
+    pos_estado = models.CharField(max_length=50, choices=ESTADOS, default='pendiente')
     pos_fechaPostulacion = models.DateTimeField(auto_now_add=True)
     pos_aspirante_fk = models.ForeignKey(Aspirante, on_delete=models.CASCADE)
     pos_vacante_fk = models.ForeignKey(Vacante, on_delete=models.CASCADE)

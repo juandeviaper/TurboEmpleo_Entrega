@@ -356,9 +356,26 @@ class PostulacionWriteSerializer(serializers.ModelSerializer):
         aspirante = data.get('pos_aspirante_fk')
         vacante = data.get('pos_vacante_fk')
         
+        if not aspirante or not vacante:
+            raise serializers.ValidationError({
+                'detail': 'Se requieren tanto el aspirante como la vacante.'
+            })
+
+        # Validar que la postulación no exista
         if Postulacion.objects.filter(pos_aspirante_fk=aspirante, pos_vacante_fk=vacante).exists():
             raise serializers.ValidationError({
                 'detail': 'Ya te has postulado a esta vacante anteriormente.'
+            })
+
+        # Asegurar que el estado sea válido y en minúsculas
+        estado = data.get('pos_estado', 'pendiente').lower()
+        data['pos_estado'] = estado
+        
+        # Validar que el estado sea uno de los permitidos
+        estados_validos = [estado[0] for estado in Postulacion.ESTADOS]
+        if estado not in estados_validos:
+            raise serializers.ValidationError({
+                'pos_estado': f'Estado inválido. Debe ser uno de: {", ".join(estados_validos)}'
             })
         
         return data
